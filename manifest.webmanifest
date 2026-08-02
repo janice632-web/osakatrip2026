@@ -1,9 +1,8 @@
 {
   "name": "Janice Osaka Solo Trip 2026",
-  "short_name": "大阪獨旅2026",
+  "short_name": "大阪獨旅",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f4efe7",
-  "theme_color": "#f4efe7",
-  "icons": []
+  "background_color": "#f7f4ef",
+  "theme_color": "#f7f4ef"
 }

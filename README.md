@@ -1,3 +1,6 @@
-# Osaka Trip 2026 V4
+# Osaka Trip Clean Redesign
 
-解壓縮後，將所有檔案上傳至 GitHub repository 根目錄並覆蓋舊檔，Commit 後等待 GitHub Pages 更新。
+1. 解壓縮。
+2. 上傳全部檔案至 GitHub repository 根目錄，覆蓋舊檔。
+3. Commit changes。
+4. 網站開啟後可在網址後加 `?v=clean1` 避免舊快取。

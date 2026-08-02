@@ -1,5 +1,16 @@
 
-document.querySelectorAll('input[type=checkbox]').forEach(el=>{const k='check:'+el.dataset.key;el.checked=localStorage.getItem(k)==='1';el.addEventListener('change',()=>localStorage.setItem(k,el.checked?'1':'0'));});
-document.querySelectorAll('textarea[data-note]').forEach(el=>{const k='note:'+el.dataset.note;el.value=localStorage.getItem(k)||'';el.addEventListener('input',()=>localStorage.setItem(k,el.value));});
-document.querySelectorAll('.tabs').forEach(t=>{const panel=t.closest('.panel');t.querySelectorAll('.tabbtn').forEach(b=>b.addEventListener('click',()=>{t.querySelectorAll('.tabbtn').forEach(x=>x.classList.remove('active'));panel.querySelectorAll('.tabcontent').forEach(x=>x.classList.remove('active'));b.classList.add('active');panel.querySelector('#'+b.dataset.target).classList.add('active');localStorage.setItem('day6plan',b.dataset.target);}));const saved=localStorage.getItem('day6plan');if(saved){const btn=t.querySelector('[data-target="'+saved+'"]');if(btn)btn.click();}});
+document.querySelectorAll('.plan-switch').forEach(s=>{
+ const day=s.closest('.day');
+ s.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+   s.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+   day.querySelectorAll('.plan').forEach(x=>x.classList.remove('active'));
+   b.classList.add('active');
+   day.querySelector('#'+b.dataset.target).classList.add('active');
+ }));
+});
+document.querySelectorAll('textarea[data-note]').forEach(el=>{
+ const key='note:'+el.dataset.note;
+ el.value=localStorage.getItem(key)||'';
+ el.addEventListener('input',()=>localStorage.setItem(key,el.value));
+});
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js'));}
