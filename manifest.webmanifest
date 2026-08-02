@@ -1,8 +1,8 @@
 {
-  "name": "Janice Osaka Trip Transit Guide",
+  "name": "Janice Osaka Trip 2026",
   "short_name": "大阪獨旅",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f6f3ee",
-  "theme_color": "#f6f3ee"
+  "background_color": "#f5f1eb",
+  "theme_color": "#f5f1eb"
 }
