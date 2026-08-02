@@ -1,6 +1,8 @@
-# Osaka Trip Clean Redesign
+# Osaka Trip Transit + Shopping List
 
-1. 解壓縮。
-2. 上傳全部檔案至 GitHub repository 根目錄，覆蓋舊檔。
-3. Commit changes。
-4. 網站開啟後可在網址後加 `?v=clean1` 避免舊快取。
+- 已移除所有照片
+- 加入各段交通、上下車站與出口資訊
+- 新增可編輯的必買清單分頁
+- 必買清單資料儲存在瀏覽器 localStorage
+
+更新：解壓縮後將所有檔案覆蓋上傳至 GitHub repository 根目錄，Commit 後使用 `?v=transit1` 開啟。
