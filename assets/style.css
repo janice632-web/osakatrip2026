@@ -83,3 +83,95 @@ main{max-width:820px;margin:auto;padding:14px 14px 76px}
   h1{font-size:64px}.summary{grid-template-columns:repeat(4,1fr)}
   .form{grid-template-columns:1.1fr .8fr 1fr 1fr auto}.form button{padding:0 18px}
 }
+
+.smart-route{
+  margin:4px 18px 18px;
+  border:1px solid var(--line);
+  border-radius:17px;
+  background:#fff;
+  overflow:hidden;
+}
+.smart-route-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-end;
+  padding:13px 14px;
+  background:#f8f5f0;
+  border-bottom:1px solid var(--line);
+}
+.smart-route-head small{
+  display:block;
+  font-size:10px;
+  letter-spacing:.14em;
+  color:var(--accent);
+  font-weight:900;
+}
+.smart-route-head h3{
+  margin:3px 0 0;
+  font-size:16px;
+}
+.smart-route-head>span{
+  color:var(--muted);
+  font-size:12px;
+  font-weight:800;
+}
+.smart-route-list{padding:0 13px}
+.smart-route-item{
+  display:grid;
+  grid-template-columns:58px 1fr auto;
+  gap:10px;
+  align-items:center;
+  padding:12px 0;
+  border-top:1px solid var(--line);
+}
+.smart-route-item:first-child{border-top:0}
+.smart-route-item.done{opacity:.48}
+.smart-route-time{
+  color:var(--accent);
+  font-size:12px;
+  font-weight:900;
+}
+.smart-route-main b,.smart-route-main span,.smart-route-main small{display:block}
+.smart-route-main b{font-size:14px}
+.smart-route-main span{font-size:12px;color:var(--muted);margin-top:2px}
+.smart-route-main small{font-size:12px;margin-top:4px}
+.smart-route-nav{
+  border-radius:999px;
+  padding:7px 10px;
+  background:#eaf0f5;
+  color:var(--blue);
+  font-size:12px;
+  font-weight:900;
+}
+.smart-route-empty{
+  color:var(--muted);
+  font-size:13px;
+  text-align:center;
+  padding:18px 0;
+}
+.smart-form{grid-template-columns:1fr}
+.shopping-help{
+  margin-top:10px;
+  padding:12px 13px;
+  border-radius:14px;
+  background:#fff2dd;
+  color:#69543b;
+  font-size:13px;
+}
+.item-route-meta{
+  color:var(--accent);
+  font-size:12px;
+  font-weight:800;
+  margin-top:4px;
+}
+.inline-map{
+  display:inline-block;
+  margin-top:7px;
+  color:var(--blue);
+  font-size:12px;
+  font-weight:900;
+}
+@media(min-width:720px){
+ .smart-form{grid-template-columns:1fr .8fr 1fr .8fr .7fr 1fr auto}
+}

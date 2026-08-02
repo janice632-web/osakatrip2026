@@ -1,8 +1,10 @@
-# Osaka Trip Beautified
+# Osaka Trip Smart Shopping
 
-- 恢復版頭照片
-- 恢復時間軸行程排列
-- 交通資訊改為可展開的備註
-- 必買清單可新增、編輯、分類、勾選與刪除
+新增功能：
+- 必買清單可選 Day 1–6 與時間
+- 自動插入對應日行程
+- 依時間排序
+- 依購買地點自動產生 Google Maps 導航
+- 支援編輯、刪除、勾選與分類
 
-更新 GitHub 後可用 `?v=beautified2` 開啟。
+更新 GitHub 後可使用 `?v=smartshopping1` 開啟。
