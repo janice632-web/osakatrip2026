@@ -1,20 +1,10 @@
-# Travel Companion V2 Core
+# Travel Companion V2 Core Login-Free Fix
 
-## 啟用順序
-1. 在 Supabase SQL Editor 執行 `SUPABASE_PRIVATE_LINK_SETUP.sql`。
-2. 確認 `travel-images` Bucket 為 Public，且已有 anon INSERT/UPDATE/DELETE Policy。
-3. 將本專案全部檔案上傳至 GitHub Repository 根目錄並覆蓋舊檔。
-4. 開啟網站，按「建立私人旅程」。
-5. 立即到「更多」複製並保存：
-   - 私人編輯網址
-   - 唯讀分享網址
+修正：
+- 移除外部 Supabase CDN 依賴
+- 改用原生 fetch 呼叫 Supabase RPC
+- 圖片直接上傳 Supabase Storage
+- 跨裝置同步改為每 5 秒檢查，避免 Realtime SDK 載入失敗
+- 載入失敗會顯示明確錯誤，不再卡住
 
-## 核心功能
-- 不登入的私人編輯網址
-- 唯讀分享網址
-- Supabase Realtime 同步
-- Storage 圖片同步
-- 行程管理
-- 必買清單（圖片、金額、對象）
-- 花費記帳
-- JSON 備份
+部署後請用 `?v=corefix1` 開啟。

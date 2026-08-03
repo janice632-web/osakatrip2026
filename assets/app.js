@@ -1,8 +1,40 @@
 
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, STORAGE_BUCKET } from "./config.js";
 
-const supabase=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const API_HEADERS={
+  "apikey":SUPABASE_PUBLISHABLE_KEY,
+  "Authorization":"Bearer "+SUPABASE_PUBLISHABLE_KEY,
+  "Content-Type":"application/json"
+};
+async function rpc(name,args){
+  const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`,{
+    method:"POST",
+    headers:API_HEADERS,
+    body:JSON.stringify(args)
+  });
+  const text=await r.text();
+  let body=null;
+  try{body=text?JSON.parse(text):null}catch{body=text}
+  if(!r.ok)throw new Error(body?.message||body?.hint||body||`HTTP ${r.status}`);
+  return body;
+}
+async function uploadToStorage(path,blob){
+  const r=await fetch(`${SUPABASE_URL}/storage/v1/object/${STORAGE_BUCKET}/${path}`,{
+    method:"POST",
+    headers:{
+      "apikey":SUPABASE_PUBLISHABLE_KEY,
+      "Authorization":"Bearer "+SUPABASE_PUBLISHABLE_KEY,
+      "Content-Type":"image/webp",
+      "x-upsert":"false"
+    },
+    body:blob
+  });
+  const text=await r.text();
+  let body=null;
+  try{body=text?JSON.parse(text):null}catch{body=text}
+  if(!r.ok)throw new Error(body?.message||body||`HTTP ${r.status}`);
+  return `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${path}`;
+}
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const qs=new URLSearchParams(location.search);
 let tripId=qs.get("trip"), editToken=qs.get("key"), readToken=qs.get("view");
@@ -43,14 +75,13 @@ function activeToken(){return editToken||readToken}
 
 async function createTrip(){
  const e=token(),r=token();
- const {data:id,error}=await supabase.rpc("create_private_trip",{p_title:"Osaka 2026",p_edit_token:e,p_read_token:r,p_payload:initialData});
- if(error){alert("建立失敗："+error.message);return}
+ let id;try{id=await rpc("create_private_trip",{p_title:"Osaka 2026",p_edit_token:e,p_read_token:r,p_payload:initialData})}catch(error){alert("建立失敗："+error.message);return}
  const url=new URL(location.href);url.search="";url.searchParams.set("trip",id);url.searchParams.set("key",e);
  location.href=url.toString();
 }
 async function fetchTrip(){
- const {data:rows,error}=await supabase.rpc("get_private_trip",{p_trip_id:tripId,p_token:activeToken()});
- if(error||!rows?.length)throw new Error(error?.message||"找不到旅程");
+ const rows=await rpc("get_private_trip",{p_trip_id:tripId,p_token:activeToken()});
+ if(!rows?.length)throw new Error("找不到旅程");
  readonly=!rows[0].can_edit;
  data=rows[0].payload;
  localStorage.setItem("tripCache:"+tripId,JSON.stringify(data));
@@ -61,8 +92,7 @@ async function fetchTrip(){
 async function saveCloud(){
  if(readonly||!tripId||!editToken)return;
  setSync("同步中…");
- const {error}=await supabase.rpc("update_private_trip",{p_trip_id:tripId,p_edit_token:editToken,p_payload:data});
- if(error){setSync("同步失敗，已保留本機");localStorage.setItem("tripCache:"+tripId,JSON.stringify(data));return}
+ try{await rpc("update_private_trip",{p_trip_id:tripId,p_edit_token:editToken,p_payload:data})}catch(error){setSync("同步失敗，已保留本機");localStorage.setItem("tripCache:"+tripId,JSON.stringify(data));return}
  setSync("已同步 "+new Date().toLocaleTimeString("zh-TW",{hour:"2-digit",minute:"2-digit"}));
 }
 function queueSave(){
@@ -70,16 +100,28 @@ function queueSave(){
  clearTimeout(saveTimer);saveTimer=setTimeout(saveCloud,900);
 }
 function subscribeRealtime(){
- if(channel) supabase.removeChannel(channel);
- channel=supabase.channel("trip-"+tripId).on("postgres_changes",{event:"UPDATE",schema:"public",table:"private_trips",filter:"id=eq."+tripId},async()=>{if(document.hidden)return;await fetchTrip()}).subscribe();
+ if(channel)clearInterval(channel);
+ channel=setInterval(async()=>{
+   if(document.hidden)return;
+   try{
+     const rows=await rpc("get_private_trip",{p_trip_id:tripId,p_token:activeToken()});
+     if(!rows?.length)return;
+     const incoming=JSON.stringify(rows[0].payload);
+     const current=JSON.stringify(data);
+     if(incoming!==current){
+       data=rows[0].payload;
+       localStorage.setItem("tripCache:"+tripId,JSON.stringify(data));
+       renderAll();
+       setSync("已收到其他裝置更新");
+     }
+   }catch{}
+ },5000);
 }
 
 async function uploadImage(file,folder){
  const ext="webp", path=`${tripId}/${folder}/${crypto.randomUUID()}.${ext}`;
  const blob=await compressImage(file);
- const {error}=await supabase.storage.from(STORAGE_BUCKET).upload(path,blob,{contentType:"image/webp",upsert:false});
- if(error)throw error;
- return supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path).data.publicUrl;
+ return await uploadToStorage(path,blob);
 }
 function compressImage(file){
  return new Promise((resolve,reject)=>{
@@ -180,3 +222,16 @@ async function init(){
  }catch(e){if(!data){alert(e.message);$("#app").classList.add("hidden");$("#welcome").classList.remove("hidden")}else setSync("目前離線")}
 }
 init();
+
+window.addEventListener("error",e=>{
+  const loading=document.querySelector("#loading");
+  if(loading && !loading.classList.contains("hidden")){
+    loading.innerHTML=`<div style="padding:24px;text-align:center"><b>網站載入失敗</b><p style="font-size:13px;color:#746e66">${String(e.message||"請重新整理")}</p><button onclick="location.reload()" style="border:0;border-radius:12px;padding:10px 14px;font-weight:900">重新整理</button></div>`;
+  }
+});
+setTimeout(()=>{
+  const loading=document.querySelector("#loading");
+  if(loading && !loading.classList.contains("hidden")){
+    loading.innerHTML='<div style="padding:24px;text-align:center"><b>載入時間過久</b><p style="font-size:13px;color:#746e66">請確認已上傳完整檔案，並重新整理頁面。</p><button onclick="location.reload()" style="border:0;border-radius:12px;padding:10px 14px;font-weight:900">重新整理</button></div>';
+  }
+},8000);
