@@ -1,10 +1,10 @@
-# Travel Companion V2 Core Login-Free Fix
+# Travel Companion V2 Core Fix 3
 
-修正：
-- 移除外部 Supabase CDN 依賴
-- 改用原生 fetch 呼叫 Supabase RPC
-- 圖片直接上傳 Supabase Storage
-- 跨裝置同步改為每 5 秒檢查，避免 Realtime SDK 載入失敗
-- 載入失敗會顯示明確錯誤，不再卡住
+此版將 JavaScript 改成全新檔名 `app.v3.js`，避免 GitHub Pages、瀏覽器或舊 Service Worker 繼續讀取有語法錯誤的舊 `app.js`。
 
-部署後請用 `?v=corefix1` 開啟。
+請完整覆蓋 GitHub Repository 根目錄，並確認 assets 內有：
+- app.v3.js
+- config.v3.js
+
+部署後開啟：
+`https://janice632-web.github.io/osakatrip2026/?v=corefix3`
