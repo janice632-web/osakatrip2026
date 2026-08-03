@@ -1,11 +1,12 @@
-# OSAKA 2026｜Janice's Journey Gift Budget
+# OSAKA 2026｜Janice's Journey — Cloud Sync v2
 
-新增：
-- 必買清單金額欄位（日圓）
-- 每件商品顯示金額
-- 依送禮對象自動彙總
-- 每人顯示預計總額、已買金額、待買金額與項目數
-- 顯示全部商品總金額
-- 金額會包含在完整備份中
+核心雲端版已加入：
+- Supabase Email Magic Link 登入
+- iPhone／iPad／電腦跨裝置同步
+- 必買清單、金額、送禮對象、圖片同步
+- 想去景點、行程時間、隱藏行程、備忘同步
+- Realtime 即時更新；未開啟 Realtime 時仍每分鐘檢查更新
+- 離線保留與恢復連線後同步
+- JSON 備份功能保留
 
-更新 GitHub 後建議使用 `?v=giftbudget1` 開啟。
+部署前請閱讀 `SUPABASE_SETUP.md`。

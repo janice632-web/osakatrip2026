@@ -1,7 +1,9 @@
 <!doctype html><html lang="zh-Hant"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1eb"><link rel="manifest" href="./manifest.webmanifest">
-<link rel="stylesheet" href="./assets/style.css"><title>OSAKA 2026｜Janice's Journey</title></head>
+<link rel="stylesheet" href="./assets/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<title>OSAKA 2026｜Janice's Journey</title></head>
 <body>
 <header class="hero" style="background-image:url('https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&w=1800&q=88')"><div class="hero-inner">
 <div class="eyebrow">OSAKA 2026</div>
@@ -17,6 +19,10 @@
   <div class="weather-loading">正在更新旅程當地天氣…</div>
 </div>
 </div></header>
+<div class="cloud-bar">
+  <div class="cloud-status"><span id="cloudStatusDot" data-state="offline"></span><span id="cloudStatusText">僅本機</span></div>
+  <button id="cloudAccountButton" type="button">登入同步</button>
+</div>
 <nav class="nav">
 <a href="#" class="primary" data-page="itinerary">每日行程</a>
 <a href="#" data-page="shopping">必買清單</a>
@@ -441,5 +447,25 @@
 
 </main>
 <div class="editable-time-help">行程時間可直接點擊時間欄位修改；修改後會自動保存在目前裝置。</div><div class="footer">交通備註預設收合，點開即可查看上下車站、轉乘與出口；實際以現場指標與即時導航為準。</div>
+
+<div id="cloudAuthModal" class="cloud-modal" aria-hidden="true">
+  <div class="cloud-dialog" role="dialog" aria-modal="true" aria-labelledby="cloudDialogTitle">
+    <button id="cloudModalClose" class="cloud-close" type="button" aria-label="關閉">×</button>
+    <small>SUPABASE CLOUD</small>
+    <h2 id="cloudDialogTitle">跨裝置同步</h2>
+    <p id="cloudUserEmail">尚未登入</p>
+    <form id="cloudLoginForm">
+      <input name="email" type="email" autocomplete="email" placeholder="輸入你的 Email" required>
+      <button type="submit">寄送登入連結</button>
+    </form>
+    <p id="cloudLoginMessage" class="cloud-help">iPhone、iPad 與電腦使用同一個 Email 登入，即可讀取同一份資料。</p>
+    <div class="cloud-dialog-actions">
+      <button id="cloudSyncButton" type="button" hidden>立即同步</button>
+      <button id="cloudLogoutButton" class="secondary" type="button" hidden>登出</button>
+    </div>
+  </div>
+</div>
+
 <script src="./assets/app.js"></script>
+<script src="./assets/cloud-sync.js"></script>
 </body></html>
