@@ -175,8 +175,25 @@ function applyReadonly(){
 function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 
 function openEditor(title,fields,onSave){
- $("#dialogTitle").textContent=title;$("#editorFields").innerHTML=fields.map(f=>`<div class="field"><label>${f.label}</label>${f.type==="textarea"?`<textarea name="${f.name}">${esc(f.value||"")}</textarea>`:f.type==="select"?`<select name="${f.name}">${f.options.map(o=>`<option value="${o}" ${String(o)===String(f.value)?"selected":""}>${o}</option>`).join("")}</select>`:`<input type="${f.type||"text"}" name="${f.name}" value="${esc(f.value||"")}"></div>`).join("");
- $("#editorDialog").showModal();$("#editorForm").onsubmit=e=>{e.preventDefault();const fd=new FormData(e.target);onSave(Object.fromEntries(fd));$("#editorDialog").close()}
+ $("#dialogTitle").textContent=title;
+ $("#editorFields").innerHTML=fields.map(f=>{
+   let control="";
+   if(f.type==="textarea"){
+     control=`<textarea name="${f.name}">${esc(f.value||"")}</textarea>`;
+   }else if(f.type==="select"){
+     control=`<select name="${f.name}">${f.options.map(o=>`<option value="${o}" ${String(o)===String(f.value)?"selected":""}>${o}</option>`).join("")}</select>`;
+   }else{
+     control=`<input type="${f.type||"text"}" name="${f.name}" value="${esc(f.value||"")}">`;
+   }
+   return `<div class="field"><label>${f.label}</label>${control}</div>`;
+ }).join("");
+ $("#editorDialog").showModal();
+ $("#editorForm").onsubmit=e=>{
+   e.preventDefault();
+   const fd=new FormData(e.target);
+   onSave(Object.fromEntries(fd));
+   $("#editorDialog").close();
+ };
 }
 
 window.editItinerary=id=>{const x=data.itinerary.find(v=>v.id===id);openEditor("編輯行程",[
