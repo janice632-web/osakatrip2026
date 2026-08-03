@@ -355,12 +355,27 @@
 <div class="stat"><b id="doneCount">0</b><span>已買</span></div>
 <div class="stat"><b id="leftCount">0</b><span>待買</span></div>
 </div>
+<div class="budget-summary">
+  <div class="budget-summary-head">
+    <div>
+      <small>GIFT BUDGET</small>
+      <h3>依對象金額統計</h3>
+    </div>
+    <div class="budget-grand-total">
+      <span>總計</span>
+      <b id="grandTotal">¥0</b>
+    </div>
+  </div>
+  <div id="recipientBudgetList" class="recipient-budget-list"></div>
+</div>
 <form id="buyForm" class="form smart-form">
 <input name="name" placeholder="商品名稱＊" required>
 <select name="category">
 <option>動漫周邊</option><option>藥妝美妝</option><option>食品伴手禮</option>
 <option>服飾雜貨</option><option>電器用品</option><option>其他</option>
 </select>
+<input name="recipient" placeholder="送禮對象／自己">
+<input name="amount" type="number" min="0" step="1" inputmode="numeric" placeholder="金額 ¥">
 <input name="place" placeholder="購買地點＊" required>
 <select name="day">
 <option value="">不加入行程</option>
@@ -370,6 +385,9 @@
 </select>
 <input name="time" type="time" aria-label="建議購買時間">
 <input name="note" placeholder="價格、規格或備註">
+<label class="shopping-image-label">上傳商品圖片
+<input name="image" type="file" accept="image/*">
+</label>
 <button type="submit">新增並排序</button>
 </form>
 <div class="shopping-help">
@@ -422,6 +440,6 @@
 </div>
 
 </main>
-<div class="footer">交通備註預設收合，點開即可查看上下車站、轉乘與出口；實際以現場指標與即時導航為準。</div>
+<div class="editable-time-help">行程時間可直接點擊時間欄位修改；修改後會自動保存在目前裝置。</div><div class="footer">交通備註預設收合，點開即可查看上下車站、轉乘與出口；實際以現場指標與即時導航為準。</div>
 <script src="./assets/app.js"></script>
 </body></html>

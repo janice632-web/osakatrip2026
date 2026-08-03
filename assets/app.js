@@ -21,10 +21,10 @@ document.querySelectorAll('textarea[data-note]').forEach(el=>{
 });
 
 const defaultItems=[
-{id:crypto.randomUUID(),name:'柯南限定周邊',category:'動漫周邊',place:'USJ／讀賣電視台',day:'4',time:'18:30',note:'先確認限購與庫存',done:false},
-{id:crypto.randomUUID(),name:'任天堂限定商品',category:'動漫周邊',place:'Nintendo OSAKA',day:'5',time:'10:30',note:'依現場庫存決定',done:false},
-{id:crypto.randomUUID(),name:'日本藥妝',category:'藥妝美妝',place:'心齋橋',day:'6',time:'10:00',note:'最後一天補買',done:false},
-{id:crypto.randomUUID(),name:'大阪伴手禮',category:'食品伴手禮',place:'梅田',day:'5',time:'13:30',note:'確認保存期限',done:false}
+{id:crypto.randomUUID(),name:'柯南限定周邊',category:'動漫周邊',recipient:'自己',amount:0,place:'USJ／讀賣電視台',day:'4',time:'18:30',note:'先確認限購與庫存',image:'',done:false},
+{id:crypto.randomUUID(),name:'任天堂限定商品',category:'動漫周邊',recipient:'自己',amount:0,place:'Nintendo OSAKA',day:'5',time:'10:30',note:'依現場庫存決定',image:'',done:false},
+{id:crypto.randomUUID(),name:'日本藥妝',category:'藥妝美妝',recipient:'自己',amount:0,place:'心齋橋',day:'6',time:'10:00',note:'最後一天補買',image:'',done:false},
+{id:crypto.randomUUID(),name:'大阪伴手禮',category:'食品伴手禮',recipient:'同事／家人',amount:0,place:'梅田',day:'5',time:'13:30',note:'確認保存期限',image:'',done:false}
 ];
 let items=JSON.parse(localStorage.getItem('buyItems')||'null')||defaultItems;
 let currentFilter='全部';
@@ -262,3 +262,286 @@ document.querySelectorAll('.weather-card').forEach(card=>{
 document.querySelectorAll('[data-weather-refresh]').forEach(btn=>btn.addEventListener('click',()=>loadWeatherCard(document.querySelector('#weatherDay'+btn.dataset.weatherRefresh))));
 loadHeroWeather();
 setInterval(()=>{document.querySelectorAll('.weather-card').forEach(loadWeatherCard);loadHeroWeather();},30*60*1000);
+
+
+// ---------- 固定行程時間可手動調整 ----------
+function setupEditableTimes(){
+  document.querySelectorAll('.fixed-item .time').forEach((el,index)=>{
+    const item=el.closest('.fixed-item');
+    if(!item)return;
+    const id=item.dataset.itemId || `fixed-time-${index}`;
+    const original=el.textContent.trim();
+    if(!el.dataset.originalTime)el.dataset.originalTime=original;
+    const saved=localStorage.getItem('fixedTime:'+id);
+    if(saved)el.textContent=saved;
+    el.classList.add('editable-time');
+    el.tabIndex=0;
+    const activate=()=>{
+      if(el.querySelector('input'))return;
+      const current=el.textContent.trim();
+      const wrap=document.createElement('div');
+      wrap.className='time-edit-wrap';
+      const input=document.createElement('input');
+      input.className='time-edit-input';
+      input.type='text';
+      input.value=current;
+      input.placeholder='例如 09:30';
+      input.setAttribute('aria-label','修改行程時間');
+      const reset=document.createElement('button');
+      reset.type='button';
+      reset.className='time-reset';
+      reset.textContent='還原';
+      wrap.append(input,reset);
+      el.textContent='';
+      el.appendChild(wrap);
+      input.focus();
+      input.select();
+      const save=()=>{
+        const value=input.value.trim() || original;
+        localStorage.setItem('fixedTime:'+id,value);
+        el.textContent=value;
+      };
+      input.addEventListener('blur',save,{once:true});
+      input.addEventListener('keydown',e=>{
+        if(e.key==='Enter'){e.preventDefault();input.blur();}
+        if(e.key==='Escape'){el.textContent=current;}
+      });
+      reset.addEventListener('mousedown',e=>e.preventDefault());
+      reset.addEventListener('click',()=>{
+        localStorage.removeItem('fixedTime:'+id);
+        el.textContent=original;
+      });
+    };
+    el.addEventListener('click',activate);
+    el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();activate();}});
+  });
+}
+
+// ---------- 商品圖片與送禮對象 ----------
+async function compressShoppingImage(file,maxSide=1000,quality=.72){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        let w=img.width,h=img.height;
+        const scale=Math.min(1,maxSide/Math.max(w,h));
+        w=Math.round(w*scale);h=Math.round(h*scale);
+        const canvas=document.createElement('canvas');
+        canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg',quality));
+      };
+      img.onerror=reject;
+      img.src=reader.result;
+    };
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+const originalRender = render;
+render = function(){
+  const filtered=items.filter(x=>currentFilter==='全部'||x.category===currentFilter);
+  list.innerHTML=filtered.length?filtered.map(x=>`
+ <div class="buy-item ${x.done?'done':''}">
+  <input type="checkbox" ${x.done?'checked':''} onchange="toggleItem('${x.id}')">
+  <div>
+    <div class="item-name">${esc(x.name)}</div>
+    <div class="item-meta">${esc(x.category)}｜${esc(x.place)}</div>
+    ${x.recipient?`<span class="item-recipient">對象：${esc(x.recipient)}</span>`:''}
+    <div class="item-route-meta">${esc(routeLabel(x))}</div>
+    ${x.note?`<div class="item-note">${esc(x.note)}</div>`:''}
+    ${x.image?`<div class="buy-photo"><img src="${x.image}" alt="${esc(x.name)}"></div>`:''}
+    ${x.place?`<a class="inline-map" target="_blank" href="${mapUrl(x.place)}">Google Maps 導航 ↗</a>`:''}
+  </div>
+  <div class="item-actions">
+    <button class="iconbtn" onclick="editItem('${x.id}')">編輯</button>
+    <button class="iconbtn" onclick="replaceBuyImage('${x.id}')">圖片</button>
+    <button class="iconbtn" onclick="deleteItem('${x.id}')">刪除</button>
+  </div>
+ </div>`).join(''):'<div class="empty">目前沒有項目</div>';
+ document.querySelector('#totalCount').textContent=items.length;
+ document.querySelector('#doneCount').textContent=items.filter(x=>x.done).length;
+ document.querySelector('#leftCount').textContent=items.filter(x=>!x.done).length;
+};
+
+window.replaceBuyImage=id=>{
+  const x=items.find(i=>i.id===id);if(!x)return;
+  const input=document.createElement('input');
+  input.type='file';input.accept='image/*';
+  input.onchange=async()=>{
+    if(!input.files[0])return;
+    try{
+      x.image=await compressShoppingImage(input.files[0]);
+      save();
+    }catch(e){alert('圖片處理失敗。');}
+  };
+  input.click();
+};
+
+window.editItem=id=>{
+ const x=items.find(i=>i.id===id);if(!x)return;
+ const name=prompt('商品名稱',x.name);if(name===null)return;
+ const recipient=prompt('送禮對象／自己',x.recipient||'');if(recipient===null)return;
+ const place=prompt('購買地點',x.place);if(place===null)return;
+ const day=prompt('加入哪一天？請輸入 1–6；留白代表不加入行程',x.day||'');if(day===null)return;
+ const time=prompt('建議時間（HH:MM）',x.time||'');if(time===null)return;
+ const note=prompt('備註',x.note||'');if(note===null)return;
+ x.name=name.trim()||x.name;
+ x.recipient=recipient.trim();
+ x.place=place.trim();
+ x.day=/^[1-6]$/.test(day.trim())?day.trim():'';
+ x.time=/^\d{2}:\d{2}$/.test(time.trim())?time.trim():'';
+ x.note=note.trim();
+ save();
+};
+
+form.onsubmit=async e=>{
+ e.preventDefault();
+ const fd=new FormData(form);
+ const name=fd.get('name').trim();
+ const place=fd.get('place').trim();
+ if(!name||!place)return;
+ let image='';
+ const file=fd.get('image');
+ if(file && file.size){
+   try{image=await compressShoppingImage(file);}
+   catch(err){alert('圖片處理失敗，將先儲存文字資料。');}
+ }
+ items.unshift({
+   id:crypto.randomUUID(),
+   name,
+   category:fd.get('category'),
+   recipient:fd.get('recipient').trim(),
+   place,
+   day:fd.get('day'),
+   time:fd.get('time'),
+   note:fd.get('note').trim(),
+   image,
+   done:false
+ });
+ form.reset();
+ save();
+};
+
+setupEditableTimes();
+render();
+renderSmartRoutes();
+
+
+// ---------- 金額與依送禮對象統計 ----------
+function formatYen(value){
+  const n=Number(value)||0;
+  return '¥'+Math.round(n).toLocaleString('ja-JP');
+}
+function recipientName(item){
+  return (item.recipient||'未指定對象').trim()||'未指定對象';
+}
+function renderRecipientBudgets(){
+  const container=document.querySelector('#recipientBudgetList');
+  const grand=document.querySelector('#grandTotal');
+  if(!container||!grand)return;
+  const groups={};
+  items.forEach(item=>{
+    const name=recipientName(item);
+    if(!groups[name])groups[name]={total:0,done:0,pending:0,count:0};
+    const amount=Number(item.amount)||0;
+    groups[name].total+=amount;
+    groups[name].count+=1;
+    if(item.done)groups[name].done+=amount;
+    else groups[name].pending+=amount;
+  });
+  const rows=Object.entries(groups).sort((a,b)=>b[1].total-a[1].total);
+  const total=rows.reduce((sum,[,g])=>sum+g.total,0);
+  grand.textContent=formatYen(total);
+  container.innerHTML=rows.length?rows.map(([name,g])=>`
+    <div class="recipient-budget-item">
+      <div>
+        <div class="recipient-budget-name">${esc(name)}</div>
+        <div class="recipient-budget-meta">${g.count} 項｜已買 ${formatYen(g.done)}｜待買 ${formatYen(g.pending)}</div>
+      </div>
+      <div class="recipient-budget-total">
+        <b>${formatYen(g.total)}</b>
+        <span>預計總額</span>
+      </div>
+    </div>`).join(''):'<div class="no-budget">尚未輸入金額</div>';
+}
+
+render = function(){
+  const filtered=items.filter(x=>currentFilter==='全部'||x.category===currentFilter);
+  list.innerHTML=filtered.length?filtered.map(x=>`
+ <div class="buy-item ${x.done?'done':''}">
+  <input type="checkbox" ${x.done?'checked':''} onchange="toggleItem('${x.id}')">
+  <div>
+    <div class="item-name">${esc(x.name)}</div>
+    <div class="item-meta">${esc(x.category)}｜${esc(x.place)}</div>
+    ${x.recipient?`<span class="item-recipient">對象：${esc(x.recipient)}</span>`:''}
+    ${Number(x.amount)>0?`<span class="item-amount">${formatYen(x.amount)}</span>`:''}
+    <div class="item-route-meta">${esc(routeLabel(x))}</div>
+    ${x.note?`<div class="item-note">${esc(x.note)}</div>`:''}
+    ${x.image?`<div class="buy-photo"><img src="${x.image}" alt="${esc(x.name)}"></div>`:''}
+    ${x.place?`<a class="inline-map" target="_blank" href="${mapUrl(x.place)}">Google Maps 導航 ↗</a>`:''}
+  </div>
+  <div class="item-actions">
+    <button class="iconbtn" onclick="editItem('${x.id}')">編輯</button>
+    <button class="iconbtn" onclick="replaceBuyImage('${x.id}')">圖片</button>
+    <button class="iconbtn" onclick="deleteItem('${x.id}')">刪除</button>
+  </div>
+ </div>`).join(''):'<div class="empty">目前沒有項目</div>';
+  document.querySelector('#totalCount').textContent=items.length;
+  document.querySelector('#doneCount').textContent=items.filter(x=>x.done).length;
+  document.querySelector('#leftCount').textContent=items.filter(x=>!x.done).length;
+  renderRecipientBudgets();
+};
+
+window.editItem=id=>{
+ const x=items.find(i=>i.id===id);if(!x)return;
+ const name=prompt('商品名稱',x.name);if(name===null)return;
+ const recipient=prompt('送禮對象／自己',x.recipient||'');if(recipient===null)return;
+ const amount=prompt('金額（日圓）',x.amount||'');if(amount===null)return;
+ const place=prompt('購買地點',x.place);if(place===null)return;
+ const day=prompt('加入哪一天？請輸入 1–6；留白代表不加入行程',x.day||'');if(day===null)return;
+ const time=prompt('建議時間（HH:MM）',x.time||'');if(time===null)return;
+ const note=prompt('備註',x.note||'');if(note===null)return;
+ x.name=name.trim()||x.name;
+ x.recipient=recipient.trim();
+ x.amount=Math.max(0,Number(amount)||0);
+ x.place=place.trim();
+ x.day=/^[1-6]$/.test(day.trim())?day.trim():'';
+ x.time=/^\d{2}:\d{2}$/.test(time.trim())?time.trim():'';
+ x.note=note.trim();
+ save();
+};
+
+form.onsubmit=async e=>{
+ e.preventDefault();
+ const fd=new FormData(form);
+ const name=fd.get('name').trim();
+ const place=fd.get('place').trim();
+ if(!name||!place)return;
+ let image='';
+ const file=fd.get('image');
+ if(file && file.size){
+   try{image=await compressShoppingImage(file);}
+   catch(err){alert('圖片處理失敗，將先儲存文字資料。');}
+ }
+ items.unshift({
+   id:crypto.randomUUID(),
+   name,
+   category:fd.get('category'),
+   recipient:fd.get('recipient').trim(),
+   amount:Math.max(0,Number(fd.get('amount'))||0),
+   place,
+   day:fd.get('day'),
+   time:fd.get('time'),
+   note:fd.get('note').trim(),
+   image,
+   done:false
+ });
+ form.reset();
+ save();
+};
+
+render();
+renderSmartRoutes();
