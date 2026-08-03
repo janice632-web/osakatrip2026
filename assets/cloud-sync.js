@@ -1,5 +1,3 @@
-(() => {
-  'use strict';
 
   const SUPABASE_URL = 'https://eazjagzkarvuutxgjekd.supabase.co';
   const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_eqWE0FG39PYSXJRlhh4sRw_psKKFHc_';
@@ -9,12 +7,28 @@
   const SUPABASE_STORAGE_PREFIX = 'sb-';
   const SYNC_DELAY = 1200;
 
-  if (!window.supabase?.createClient) {
-    console.error('Supabase SDK 未載入');
-    return;
+  let createClient;
+  try {
+    ({ createClient } = await import('https://esm.sh/@supabase/supabase-js@2'));
+  } catch (firstError) {
+    try {
+      ({ createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'));
+    } catch (secondError) {
+      console.error('Supabase SDK 載入失敗', firstError, secondError);
+      document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.querySelector('#cloudAccountButton');
+        const modal = document.querySelector('#cloudAuthModal');
+        if (btn) btn.addEventListener('click', () => {
+          if (modal) modal.classList.add('open');
+          const msg = document.querySelector('#cloudLoginMessage');
+          if (msg) msg.textContent = '登入元件載入失敗。請關閉廣告阻擋器、確認網路後重新整理。';
+        });
+      });
+      throw secondError;
+    }
   }
 
-  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  const client = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
   });
 
@@ -281,4 +295,3 @@
     });
     setInterval(() => { if (session?.user && navigator.onLine) pullCloud(); }, 60000);
   });
-})();
