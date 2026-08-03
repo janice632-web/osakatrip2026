@@ -1,20 +1,27 @@
 <!doctype html><html lang="zh-Hant"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f1eb"><link rel="manifest" href="./manifest.webmanifest">
-<link rel="stylesheet" href="./assets/style.css"><title>Janice's Osaka Solo Trip 2026</title></head>
+<link rel="stylesheet" href="./assets/style.css"><title>OSAKA 2026｜Janice's Journey</title></head>
 <body>
 <header class="hero" style="background-image:url('https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&w=1800&q=88')"><div class="hero-inner">
-<div class="eyebrow">JANICE'S KANSAI SOLO TRIP</div>
-<h1>大阪獨旅<br>手機旅遊手冊</h1>
+<div class="eyebrow">OSAKA 2026</div>
+<h1>Janice’s Journey</h1>
+<p class="hero-tagline">Explore・Eat・Shop・Collect Memories</p>
 <p>2026.08.12—08.17｜6天5夜</p>
 <div class="tripbox">
 <div class="triprow"><b>住宿</b><span>相鐵 FRESA INN 大阪心齋橋</span></div>
-<div class="triprow"><b>去程</b><span>BR176｜18:00 神戶 T2</span></div>
-<div class="triprow"><b>回程</b><span>BR175｜19:00 神戶 T2</span></div>
-</div></div></header>
+<div class="triprow"><b>去程</b><span>BR176｜14:20 桃園 T2 → 18:00 神戶 T2</span></div>
+<div class="triprow"><b>回程</b><span>BR175｜19:00 神戶 T2 → 20:55 桃園 T2</span></div>
+</div>
+<div class="hero-weather" id="heroWeather">
+  <div class="weather-loading">正在更新旅程當地天氣…</div>
+</div>
+</div></header>
 <nav class="nav">
 <a href="#" class="primary" data-page="itinerary">每日行程</a>
 <a href="#" data-page="shopping">必買清單</a>
+<a href="#" data-page="wishlist">想去景點</a>
+<a href="#" data-page="backup">備份管理</a>
 <a href="#day1" onclick="document.querySelectorAll(&quot;.page&quot;).forEach(p=>p.classList.remove(&quot;active&quot;));document.querySelector(&quot;#itinerary&quot;).classList.add(&quot;active&quot;);">Day 1</a><a href="#day2" onclick="document.querySelectorAll(&quot;.page&quot;).forEach(p=>p.classList.remove(&quot;active&quot;));document.querySelector(&quot;#itinerary&quot;).classList.add(&quot;active&quot;);">Day 2</a><a href="#day3" onclick="document.querySelectorAll(&quot;.page&quot;).forEach(p=>p.classList.remove(&quot;active&quot;));document.querySelector(&quot;#itinerary&quot;).classList.add(&quot;active&quot;);">Day 3</a><a href="#day4" onclick="document.querySelectorAll(&quot;.page&quot;).forEach(p=>p.classList.remove(&quot;active&quot;));document.querySelector(&quot;#itinerary&quot;).classList.add(&quot;active&quot;);">Day 4</a><a href="#day5" onclick="document.querySelectorAll(&quot;.page&quot;).forEach(p=>p.classList.remove(&quot;active&quot;));document.querySelector(&quot;#itinerary&quot;).classList.add(&quot;active&quot;);">Day 5</a><a href="#day6" onclick="document.querySelectorAll(&quot;.page&quot;).forEach(p=>p.classList.remove(&quot;active&quot;));document.querySelector(&quot;#itinerary&quot;).classList.add(&quot;active&quot;);">Day 6</a>
 </nav>
 <main>
@@ -22,14 +29,40 @@
 <section class="day">
 <div class="head"><small>DAY 1 · 8/12（三）</small><h2>抵達大阪</h2><p>神戶機場 → 心齋橋 → 道頓堀</p></div>
 <div class="summary"><div class="metric"><b>抵達</b><span>18:00</span></div><div class="metric"><b>巴士</b><span>19:20</span></div><div class="metric"><b>入住</b><span>20:35</span></div><div class="metric"><b>體力</b><span>★☆☆☆☆</span></div></div>
+<div class="weather-card" id="weatherDay1" data-city="大阪" data-lat="34.6937" data-lon="135.5023" data-date="2026-08-12">
+  <div class="weather-card-head">
+    <div><small>LOCAL WEATHER</small><h3>大阪當日天氣</h3></div>
+    <button type="button" class="weather-refresh" data-weather-refresh="1">更新</button>
+  </div>
+  <div class="weather-card-body"><span class="weather-loading">讀取中…</span></div>
+</div>
+
 <div class="timeline">
-<div class="item"><div class="time">18:00</div><div class="event">
+<div class="item fixed-item" data-item-id="flight-departure">
+  <div class="time">14:20</div>
+  <div class="event">
+    <strong>BR176 桃園起飛</strong>
+    <div class="place">桃園國際機場第二航廈</div>
+    <p>建議至少於 11:50–12:20 抵達機場完成報到與托運。</p>
+    <details class="transit-note">
+      <summary>航班備註</summary>
+      <div class="transit-body">
+        <div class="transit-row"><b>出發機場</b><span>桃園國際機場 T2</span></div>
+        <div class="transit-row"><b>起飛時間</b><span>14:20（台灣時間）</span></div>
+        <div class="transit-row"><b>抵達機場</b><span>神戶機場 T2</span></div>
+        <div class="transit-row"><b>抵達時間</b><span>18:00（日本時間）</span></div>
+      </div>
+    </details>
+  </div>
+</div>
+
+<div class="item fixed-item" data-item-id="fixed-1"><div class="time">18:00</div><div class="event">
 <strong>抵達神戶機場 T2</strong><div class="place">神戶機場第二航廈</div><p>入境、領行李後直接前往神姬巴士站。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Kobe+Airport+Terminal+2">機場地圖</a></div><details class="transit-note"><summary>交通備註｜上車站、下車站與出口</summary><div class="transit-body"><div class="transit-row"><b>上車站</b><span>神戶機場第二航廈巴士站</span></div><div class="transit-row"><b>班次</b><span>19:20 神姬巴士</span></div><div class="transit-row"><b>下車站</b><span>心齋橋（長堀通）</span></div><div class="transit-row"><b>方向</b><span>下車後步行至飯店</span></div></div></details></div></div>
-<div class="item"><div class="time">20:35</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-2"><div class="time">20:35</div><div class="event">
 <strong>飯店 Check-in</strong><div class="place">相鐵 FRESA INN 大阪心齋橋</div><p>放行李、補水，稍作休息。</p>
 <div class="actions"><a class="btn alt" target="_blank" href="https://www.google.com/maps/search/?api=1&query=%E7%9B%B8%E9%90%B5FRESA+INN+%E5%A4%A7%E9%98%AA%E5%BF%83%E9%BD%8B%E6%A9%8B">飯店導航</a></div></div></div>
-<div class="item"><div class="time">21:10</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-3"><div class="time">21:10</div><div class="event">
 <strong>道頓堀晚餐與散步</strong><div class="place">道頓堀／戎橋</div><p>第一晚只排輕鬆散步，依體力提早回飯店。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin=%E7%9B%B8%E9%90%B5FRESA+INN+%E5%A4%A7%E9%98%AA%E5%BF%83%E9%BD%8B%E6%A9%8B&destination=%E9%81%93%E9%A0%93%E5%A0%80&travelmode=walking">步行導航</a></div><details class="transit-note"><summary>交通備註｜上車站、下車站與出口</summary><div class="transit-body"><div class="transit-row"><b>方式</b><span>步行</span></div><div class="transit-row"><b>起點</b><span>飯店</span></div><div class="transit-row"><b>終點</b><span>道頓堀／戎橋</span></div><div class="transit-row"><b>時間</b><span>約 15–20 分鐘</span></div></div></details></div></div>
 </div>
@@ -44,30 +77,42 @@
   </div>
   <div class="smart-route-list" id="smartRouteList1"></div>
 </div>
+<div class="restore-panel" data-restore-day="1">
+<button type="button" class="restore-toggle">管理已隱藏行程</button>
+<div class="restore-list" id="restoreListDay1"></div>
+</div>
 <div class="note"><label>今日備忘</label><textarea data-note="day1"></textarea></div>
 </section>
 </div><div id="day2">
 <section class="day">
 <div class="head"><small>DAY 2 · 8/13（四）</small><h2>大阪城 × 柯南 × 阿倍野</h2><p>遊園車、讀賣電視台、咖啡與 HARUKAS 夜景</p></div>
 <div class="summary"><div class="metric"><b>步行</b><span>10–13 km</span></div><div class="metric"><b>體力</b><span>★★★★☆</span></div><div class="metric"><b>咖啡</b><span>天王寺</span></div><div class="metric"><b>夜景</b><span>17:45</span></div></div>
+<div class="weather-card" id="weatherDay2" data-city="大阪" data-lat="34.6937" data-lon="135.5023" data-date="2026-08-13">
+  <div class="weather-card-head">
+    <div><small>LOCAL WEATHER</small><h3>大阪當日天氣</h3></div>
+    <button type="button" class="weather-refresh" data-weather-refresh="2">更新</button>
+  </div>
+  <div class="weather-card-body"><span class="weather-loading">讀取中…</span></div>
+</div>
+
 <div class="focus"><h3>🚂 大阪城遊園車</h3><p>建議由 JO-TERRACE OSAKA／大阪城公園站側搭乘，若當日未營運則改步行。</p></div>
 <div class="timeline">
-<div class="item"><div class="time">08:30</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-4"><div class="time">08:30</div><div class="event">
 <strong>飯店出發</strong><div class="place">心齋橋站</div><p>搭 Osaka Metro 前往大阪城公園。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin=Shinsaibashi+Station&destination=Morinomiya+Station&travelmode=transit">交通導航</a></div><details class="transit-note"><summary>交通備註｜上車站、下車站與出口</summary><div class="transit-body"><div class="transit-row"><b>上車站</b><span>心齋橋站 M19</span></div><div class="transit-row"><b>轉乘站</b><span>本町站轉中央線</span></div><div class="transit-row"><b>下車站</b><span>森之宮站 C19</span></div><div class="transit-row"><b>出口</b><span>1號、3A 或 3B 出口前往大阪城公園</span></div></div></details></div></div>
-<div class="item"><div class="time">09:15</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-5"><div class="time">09:15</div><div class="event">
 <strong>搭 Road Train</strong><div class="place">JO-TERRACE OSAKA／大阪城公園站側</div><p>搭至極樂橋周邊，再步行前往天守閣。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=JO-TERRACE+OSAKA+Road+Train">上車點</a><a class="btn alt" target="_blank" href="https://www.osakacastle.net/pdf/access/park_map_en.pdf">官方地圖</a></div><details class="transit-note"><summary>交通備註｜上車站、下車站與出口</summary><div class="transit-body"><div class="transit-row"><b>上車點</b><span>JO-TERRACE OSAKA／大阪城公園站側</span></div><div class="transit-row"><b>替代點</b><span>森之宮側</span></div><div class="transit-row"><b>下車點</b><span>極樂橋周邊</span></div><div class="transit-row"><b>備註</b><span>依當日營運狀況</span></div></div></details></div></div>
-<div class="item"><div class="time">10:00</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-6"><div class="time">10:00</div><div class="event">
 <strong>大阪城天守閣</strong><div class="place">大阪城天守閣</div><p>建議停留 60–90 分鐘。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Osaka+Castle+Main+Tower">天守閣導航</a></div></div></div>
-<div class="item"><div class="time">13:15</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-7"><div class="time">13:15</div><div class="event">
 <strong>讀賣電視台</strong><div class="place">讀賣電視台新社屋</div><p>拍柯南銅像與周邊展示。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Yomiuri+Telecasting+Corporation+Osaka">導航</a></div><details class="transit-note"><summary>交通備註｜上車站、下車站與出口</summary><div class="transit-body"><div class="transit-row"><b>起點</b><span>大阪城天守閣</span></div><div class="transit-row"><b>方式</b><span>步行約 20–30 分鐘</span></div><div class="transit-row"><b>最近車站</b><span>JR／京阪 京橋站</span></div><div class="transit-row"><b>備註</b><span>炎熱時可改搭短程計程車</span></div></div></details></div></div>
-<div class="item"><div class="time">15:30</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-8"><div class="time">15:30</div><div class="event">
 <strong>阿倍野逛街與咖啡</strong><div class="place">阿倍野 HARUKAS／天王寺</div><p>先逛百貨，再安排咖啡休息。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Blue+Bottle+Coffee+Tennoji">Blue Bottle</a><a class="btn alt" target="_blank" href="https://www.google.com/maps/search/?api=1&query=%E5%A0%80%E5%86%85%E6%9E%9C%E5%AE%9F%E5%9C%92+%E3%81%82%E3%81%B9%E3%81%AE%E3%83%8F%E3%83%AB%E3%82%AB%E3%82%B9%E5%BA%97">堀內果實園</a></div><details class="transit-note"><summary>交通備註｜上車站、下車站與出口</summary><div class="transit-body"><div class="transit-row"><b>上車站</b><span>京橋站</span></div><div class="transit-row"><b>路線</b><span>JR 大阪環狀線外回</span></div><div class="transit-row"><b>下車站</b><span>天王寺站</span></div><div class="transit-row"><b>出口</b><span>JR 中央口／南口；Metro 往 9、10 號出口方向</span></div></div></details></div></div>
-<div class="item"><div class="time">17:45</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-9"><div class="time">17:45</div><div class="event">
 <strong>HARUKAS 300</strong><div class="place">阿倍野 HARUKAS 300</div><p>看夕陽、夜景與柯南主題活動。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=HARUKAS+300">展望台導航</a></div></div></div>
 </div>
@@ -82,23 +127,35 @@
   </div>
   <div class="smart-route-list" id="smartRouteList2"></div>
 </div>
+<div class="restore-panel" data-restore-day="2">
+<button type="button" class="restore-toggle">管理已隱藏行程</button>
+<div class="restore-list" id="restoreListDay2"></div>
+</div>
 <div class="note"><label>今日備忘</label><textarea data-note="day2"></textarea></div>
 </section>
 </div><div id="day3">
 <section class="day">
 <div class="head"><small>DAY 3 · 8/14（五）</small><h2>京都經典四景一日遊</h2><p>嵐山、金閣寺、清水寺、伏見稻荷</p></div>
 <div class="summary"><div class="metric"><b>集合</b><span>依訂單</span></div><div class="metric"><b>交通</b><span>觀光巴士</span></div><div class="metric"><b>體力</b><span>★★★★☆</span></div><div class="metric"><b>回大阪</b><span>18:00 後</span></div></div>
+<div class="weather-card" id="weatherDay3" data-city="京都" data-lat="35.0116" data-lon="135.7681" data-date="2026-08-14">
+  <div class="weather-card-head">
+    <div><small>LOCAL WEATHER</small><h3>京都當日天氣</h3></div>
+    <button type="button" class="weather-refresh" data-weather-refresh="3">更新</button>
+  </div>
+  <div class="weather-card-body"><span class="weather-loading">讀取中…</span></div>
+</div>
+
 <div class="timeline">
-<div class="item"><div class="time">07:10</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-10"><div class="time">07:10</div><div class="event">
 <strong>飯店出發</strong><div class="place">心齋橋</div><p>依訂單前往大阪站或難波 OCAT 集合。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.klook.com/zh-TW/activity/149405-kyoto-classic-one-day-tour-chinese-guide-from-osaka/">Klook 四景團</a><a class="btn alt" target="_blank" href="https://www.klook.com/zh-TW/activity/3208-kyoto-temples-shrines-day-tour-osaka/">難波方案</a></div><details class="transit-note"><summary>交通備註｜上車站、下車站與出口</summary><div class="transit-body"><div class="transit-row"><b>難波方案</b><span>心齋橋站 → 難波站 → 步行至 OCAT</span></div><div class="transit-row"><b>梅田方案</b><span>心齋橋站 → 梅田站</span></div><div class="transit-row"><b>建議抵達</b><span>集合時間前 15 分鐘</span></div><div class="transit-row"><b>回程</b><span>原集合地附近下車後搭 Metro 回心齋橋</span></div></div></details></div></div>
-<div class="item"><div class="time">上午</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-11"><div class="time">上午</div><div class="event">
 <strong>嵐山</strong><div class="place">嵐山竹林／渡月橋</div><p>依導遊安排自由活動與午餐。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Arashiyama+Kyoto">地圖</a></div></div></div>
-<div class="item"><div class="time">下午</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-12"><div class="time">下午</div><div class="event">
 <strong>金閣寺＋清水寺</strong><div class="place">京都市區</div><p>注意集合時間，購物不要走太遠。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Kinkakuji">金閣寺</a><a class="btn alt" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Kiyomizudera">清水寺</a></div></div></div>
-<div class="item"><div class="time">傍晚</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-13"><div class="time">傍晚</div><div class="event">
 <strong>伏見稻荷</strong><div class="place">伏見稻荷大社</div><p>走千本鳥居前段即可，不需攻頂。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Fushimi+Inari+Taisha">地圖</a></div></div></div>
 </div>
@@ -113,24 +170,36 @@
   </div>
   <div class="smart-route-list" id="smartRouteList3"></div>
 </div>
+<div class="restore-panel" data-restore-day="3">
+<button type="button" class="restore-toggle">管理已隱藏行程</button>
+<div class="restore-list" id="restoreListDay3"></div>
+</div>
 <div class="note"><label>集合時間與訂單資訊</label><textarea data-note="day3"></textarea></div>
 </section>
 </div><div id="day4">
 <section class="day">
 <div class="head"><small>DAY 4 · 8/15（六）</small><h2>USJ 專屬行程</h2><p>快通 × 名偵探柯南 4-D × 任天堂世界</p></div>
 <div class="summary"><div class="metric"><b>出發</b><span>06:30</span></div><div class="metric"><b>柯南</b><span>約13:00</span></div><div class="metric"><b>任天堂</b><span>16:30</span></div><div class="metric"><b>體力</b><span>★★★★★</span></div></div>
+<div class="weather-card" id="weatherDay4" data-city="大阪" data-lat="34.6937" data-lon="135.5023" data-date="2026-08-15">
+  <div class="weather-card-head">
+    <div><small>LOCAL WEATHER</small><h3>大阪當日天氣</h3></div>
+    <button type="button" class="weather-refresh" data-weather-refresh="4">更新</button>
+  </div>
+  <div class="weather-card-body"><span class="weather-loading">讀取中…</span></div>
+</div>
+
 <div class="focus"><h3>🎟️ Express Pass</h3><p>16:30–17:00 Mario Kart、17:00–17:30 Mine Cart Madness；另含 Jurassic Park 與 Harry Potter Forbidden Journey。</p></div>
 <div class="timeline">
-<div class="item"><div class="time">06:30</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-14"><div class="time">06:30</div><div class="event">
 <strong>飯店出發</strong><div class="place">心齋橋</div><p>提早抵達 Universal City。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin=Shinsaibashi+Station&destination=Universal+City+Station&travelmode=transit">交通導航</a></div><details class="transit-note"><summary>交通備註｜上車站、下車站與出口</summary><div class="transit-body"><div class="transit-row"><b>上車站</b><span>心齋橋站</span></div><div class="transit-row"><b>轉乘</b><span>梅田／大阪站轉 JR 大阪環狀線</span></div><div class="transit-row"><b>再轉乘</b><span>西九條站轉 JR 夢咲線</span></div><div class="transit-row"><b>下車站</b><span>Universal City 站</span></div><div class="transit-row"><b>出口</b><span>出站後依 USJ／CityWalk 指標步行</span></div></div></details></div></div>
-<div class="item"><div class="time">13:00左右</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-15"><div class="time">13:00左右</div><div class="event">
 <strong>名偵探柯南 4-D Live Show</strong><div class="place">USJ 劇場區</div><p>場次以 USJ App／現場公告為準。</p>
 <div class="actions"><a class="btn alt" target="_blank" href="https://www.usj.co.jp/web/en/us/attractions/detective-conan-4d-live-show">官方介紹</a></div></div></div>
-<div class="item"><div class="time">16:30–17:30</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-16"><div class="time">16:30–17:30</div><div class="event">
 <strong>任天堂世界快通</strong><div class="place">SUPER NINTENDO WORLD</div><p>依票券順序完成 Mario Kart 與 Mine Cart Madness。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=SUPER+NINTENDO+WORLD+Japan">任天堂世界</a></div></div></div>
-<div class="item"><div class="time">晚間</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-17"><div class="time">晚間</div><div class="event">
 <strong>Jurassic Park＋Harry Potter</strong><div class="place">USJ 園區</div><p>依現場動線完成其餘快通設施。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Jurassic+Park+The+Ride+USJ">侏羅紀</a><a class="btn alt" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Harry+Potter+and+the+Forbidden+Journey+USJ">哈利波特</a></div></div></div>
 </div>
@@ -145,32 +214,44 @@
   </div>
   <div class="smart-route-list" id="smartRouteList4"></div>
 </div>
+<div class="restore-panel" data-restore-day="4">
+<button type="button" class="restore-toggle">管理已隱藏行程</button>
+<div class="restore-list" id="restoreListDay4"></div>
+</div>
 <div class="note"><label>快通、場次與購物備忘</label><textarea data-note="day4"></textarea></div>
 </section>
 </div><div id="day5">
 <section class="day">
 <div class="head"><small>DAY 5 · 8/16（日）</small><h2>梅田旗艦店購物日</h2><p>Nintendo、Pokémon、LUCUA、Yodobashi、Grand Front</p></div>
 <div class="summary"><div class="metric"><b>交通</b><span>御堂筋線</span></div><div class="metric"><b>轉乘</b><span>無</span></div><div class="metric"><b>咖啡</b><span>15:30</span></div><div class="metric"><b>體力</b><span>★★★☆☆</span></div></div>
+<div class="weather-card" id="weatherDay5" data-city="大阪" data-lat="34.6937" data-lon="135.5023" data-date="2026-08-16">
+  <div class="weather-card-head">
+    <div><small>LOCAL WEATHER</small><h3>大阪當日天氣</h3></div>
+    <button type="button" class="weather-refresh" data-weather-refresh="5">更新</button>
+  </div>
+  <div class="weather-card-body"><span class="weather-loading">讀取中…</span></div>
+</div>
+
 <div class="timeline">
-<div class="item"><div class="time">09:30</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-18"><div class="time">09:30</div><div class="event">
 <strong>飯店出發</strong><div class="place">心齋橋站</div><p>搭御堂筋線直達梅田。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin=Shinsaibashi+Station&destination=Umeda+Station&travelmode=transit">交通導航</a></div><details class="transit-note"><summary>交通備註｜上車站、下車站與出口</summary><div class="transit-body"><div class="transit-row"><b>上車站</b><span>心齋橋站 M19</span></div><div class="transit-row"><b>下車站</b><span>梅田站 M16</span></div><div class="transit-row"><b>出口／改札</b><span>Nintendo、LUCUA 往 JR大阪站／大丸梅田指標</span></div><div class="transit-row"><b>HEP FIVE</b><span>往阪急梅田／東側出口方向</span></div></div></details></div></div>
-<div class="item"><div class="time">10:00</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-19"><div class="time">10:00</div><div class="event">
 <strong>Nintendo OSAKA</strong><div class="place">大丸梅田店 13F</div><p>週日人潮多，先逛旗艦店。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Nintendo+OSAKA">導航</a></div></div></div>
-<div class="item"><div class="time">11:00</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-20"><div class="time">11:00</div><div class="event">
 <strong>Pokémon Center Osaka</strong><div class="place">大丸梅田店 13F</div><p>與 Nintendo 同棟，順路完成。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Pokemon+Center+Osaka">導航</a></div></div></div>
-<div class="item"><div class="time">12:00</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-21"><div class="time">12:00</div><div class="event">
 <strong>LUCUA Osaka</strong><div class="place">大阪站周邊</div><p>午餐、服飾、美妝與生活選物。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=LUCUA+Osaka">導航</a></div></div></div>
-<div class="item"><div class="time">14:00</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-22"><div class="time">14:00</div><div class="event">
 <strong>Yodobashi Umeda</strong><div class="place">梅田</div><p>電器、美容家電、模型與玩具。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Yodobashi+Camera+Multimedia+Umeda">導航</a></div></div></div>
-<div class="item"><div class="time">15:30</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-23"><div class="time">15:30</div><div class="event">
 <strong>咖啡休息</strong><div class="place">梅田茶屋町</div><p>首選 Blue Bottle，備選 café Kitsuné。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Blue+Bottle+Coffee+Umeda+Chayamachi">Blue Bottle</a><a class="btn alt" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Cafe+Kitsune+Osaka">café Kitsuné</a></div></div></div>
-<div class="item"><div class="time">16:30後</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-24"><div class="time">16:30後</div><div class="event">
 <strong>Grand Front＋HEP FIVE</strong><div class="place">梅田商圈</div><p>依體力決定是否加梅田藍天大廈。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Grand+Front+Osaka">Grand Front</a><a class="btn alt" target="_blank" href="https://www.google.com/maps/search/?api=1&query=HEP+FIVE">HEP FIVE</a></div></div></div>
 </div>
@@ -185,35 +266,56 @@
   </div>
   <div class="smart-route-list" id="smartRouteList5"></div>
 </div>
+<div class="restore-panel" data-restore-day="5">
+<button type="button" class="restore-toggle">管理已隱藏行程</button>
+<div class="restore-list" id="restoreListDay5"></div>
+</div>
 <div class="note"><label>購物與退稅備忘</label><textarea data-note="day5"></textarea></div>
 </section>
 </div><div id="day6">
 <section class="day">
 <div class="head"><small>DAY 6 · 8/17（一）</small><h2>回程日雙方案</h2><p>心齋橋最後採買／08:30 巴士神戶半日遊</p></div>
 <div class="summary"><div class="metric"><b>航班</b><span>19:00</span></div><div class="metric"><b>原案巴士</b><span>16:00</span></div><div class="metric"><b>備案巴士</b><span>08:30</span></div><div class="metric"><b>神戶離開</b><span>15:30前</span></div></div>
+<div class="weather-card" id="weatherDay6" data-city="神戶" data-lat="34.6901" data-lon="135.1955" data-date="2026-08-17">
+  <div class="weather-card-head">
+    <div><small>LOCAL WEATHER</small><h3>神戶當日天氣</h3></div>
+    <button type="button" class="weather-refresh" data-weather-refresh="6">更新</button>
+  </div>
+  <div class="weather-card-body"><span class="weather-loading">讀取中…</span></div>
+</div>
+
 <div class="plan-switch"><button class="active" data-target="planA">Plan A｜心齋橋</button><button data-target="planB">Plan B｜神戶半日遊</button></div>
 
 <div class="plan active" id="planA"><div class="timeline">
-<div class="item"><div class="time">09:00</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-25"><div class="time">09:00</div><div class="event">
 <strong>心齋橋最後採買</strong><div class="place">心齋橋筋商店街</div><p>不跨區，保留充足時間整理行李。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=%E5%BF%83%E9%BD%8B%E6%A9%8B%E7%AD%8B%E5%95%86%E5%BA%97%E8%A1%97">導航</a></div></div></div>
-<div class="item"><div class="time">16:00</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-26"><div class="time">16:00</div><div class="event">
 <strong>神姬巴士前往神戶機場</strong><div class="place">心齋橋（長堀通）</div><p>預計 17:01 抵達神戶機場 T2。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://shinki.bus-japan.net/timetable/20.php">官方時刻</a></div><details class="transit-note"><summary>交通備註｜上車站、下車站與出口</summary><div class="transit-body"><div class="transit-row"><b>上車站</b><span>心齋橋（長堀通）神姬巴士站</span></div><div class="transit-row"><b>下車站</b><span>神戶機場第二航廈</span></div><div class="transit-row"><b>航班</b><span>BR175 19:00 起飛</span></div></div></details></div></div>
+
+<div class="item fixed-item" data-item-id="flight-arrival-taiwan">
+  <div class="time">20:55</div>
+  <div class="event">
+    <strong>BR175 抵達桃園</strong>
+    <div class="place">桃園國際機場第二航廈</div>
+    <p>抵達時間為台灣時間，後續預留入境與領行李時間。</p>
+  </div>
+</div>
 </div></div>
 <div class="plan" id="planB">
 <div class="focus"><h3>⚓ 神戶半日遊條件</h3><p>天氣穩定、行李可順利寄放、前幾天體力尚可時使用；最晚 15:30 前離開神戶市區。</p></div>
 <div class="timeline">
-<div class="item"><div class="time">08:30</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-27"><div class="time">08:30</div><div class="event">
 <strong>搭神姬巴士</strong><div class="place">心齋橋（長堀通）</div><p>09:31 抵達神戶機場 T2，先寄放行李。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://shinki.bus-japan.net/timetable/20.php">官方時刻</a></div><details class="transit-note"><summary>交通備註｜上車站、下車站與出口</summary><div class="transit-body"><div class="transit-row"><b>上車站</b><span>心齋橋（長堀通）</span></div><div class="transit-row"><b>下車站</b><span>神戶機場第二航廈</span></div><div class="transit-row"><b>寄物</b><span>神戶機場 T2 置物櫃</span></div></div></details></div></div>
-<div class="item"><div class="time">10:00</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-28"><div class="time">10:00</div><div class="event">
 <strong>Port Liner 前往三宮</strong><div class="place">神戶機場站</div><p>車程約 18 分鐘。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin=Kobe+Airport+Station&destination=Sannomiya+Station&travelmode=transit">交通導航</a></div><details class="transit-note"><summary>交通備註｜上車站、下車站與出口</summary><div class="transit-body"><div class="transit-row"><b>上車站</b><span>神戶機場站</span></div><div class="transit-row"><b>路線</b><span>Port Liner 往三宮方向</span></div><div class="transit-row"><b>下車站</b><span>三宮站</span></div><div class="transit-row"><b>出口</b><span>依南京町／舊居留地方向步行或轉乘</span></div></div></details></div></div>
-<div class="item"><div class="time">10:40</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-29"><div class="time">10:40</div><div class="event">
 <strong>南京町 → 舊居留地 → 美利堅公園</strong><div class="place">神戶市區</div><p>以港區散步與拍照為主。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/search/?api=1&query=Kobe+Nankinmachi">南京町</a><a class="btn alt" target="_blank" href="https://www.google.com/maps/search/?api=1&query=BE+KOBE+Monument">BE KOBE</a></div></div></div>
-<div class="item"><div class="time">15:30前</div><div class="event">
+<div class="item fixed-item" data-item-id="fixed-30"><div class="time">15:30前</div><div class="event">
 <strong>返回神戶機場</strong><div class="place">三宮站</div><p>取行李、辦理報到與托運。</p>
 <div class="actions"><a class="btn" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin=Sannomiya+Station&destination=Kobe+Airport+Terminal+2&travelmode=transit">返回機場</a></div><details class="transit-note"><summary>交通備註｜上車站、下車站與出口</summary><div class="transit-body"><div class="transit-row"><b>上車站</b><span>三宮站 Port Liner</span></div><div class="transit-row"><b>下車站</b><span>神戶機場站</span></div><div class="transit-row"><b>方向</b><span>抵達後依 T2／國際線指標前往第二航廈</span></div></div></details></div></div>
 </div></div>
@@ -228,8 +330,21 @@
   </div>
   <div class="smart-route-list" id="smartRouteList6"></div>
 </div>
+<div class="restore-panel" data-restore-day="6">
+<button type="button" class="restore-toggle">管理已隱藏行程</button>
+<div class="restore-list" id="restoreListDay6"></div>
+</div>
 <div class="note"><label>最後一天決定與寄物備忘</label><textarea data-note="day6"></textarea></div>
 </section>
+
+<div class="item fixed-item" data-item-id="flight-arrival-taiwan">
+  <div class="time">20:55</div>
+  <div class="event">
+    <strong>BR175 抵達桃園</strong>
+    <div class="place">桃園國際機場第二航廈</div>
+    <p>抵達時間為台灣時間，後續預留入境與領行李時間。</p>
+  </div>
+</div>
 </div></div>
 <div id="shopping" class="page">
 <section class="box">
@@ -274,6 +389,38 @@
 </div>
 </section>
 </div>
+
+<div id="wishlist" class="page">
+<section class="box">
+<div class="head"><small>WISH LIST</small><h2>想去景點</h2><p>可指定日期與時間，自動排入當天行程並產生導航。</p></div>
+<div class="shopping-wrap">
+<form id="wishForm" class="form wish-form">
+<input name="name" placeholder="景點／餐廳名稱＊" required>
+<select name="type"><option>景點</option><option>神社寺廟</option><option>咖啡廳</option><option>美食</option><option>購物</option><option>其他</option></select>
+<input name="place" placeholder="地址或 Google Maps 搜尋名稱＊" required>
+<select name="day"><option value="">暫不排行程</option><option value="1">Day 1｜8/12</option><option value="2">Day 2｜8/13</option><option value="3">Day 3｜8/14</option><option value="4">Day 4｜8/15</option><option value="5">Day 5｜8/16</option><option value="6">Day 6｜8/17</option></select>
+<input name="time" type="time">
+<select name="priority"><option value="高">高優先</option><option value="中" selected>中優先</option><option value="低">低優先</option></select>
+<input name="note" placeholder="停留時間、備註">
+<button type="submit">新增景點</button>
+</form>
+<div class="shopping-help">可為每個景點上傳一張入口照片或地圖，圖片只保存在目前裝置。</div>
+<div id="wishList" class="wish-list"></div>
+</div>
+</section>
+</div>
+
+<div id="backup" class="page">
+<section class="box">
+<div class="head"><small>BACKUP</small><h2>備份與還原</h2><p>匯出必買清單、想去景點、行程刪減、照片與所有備忘。</p></div>
+<div class="backup-wrap">
+<button id="exportBackup" class="backup-btn">匯出完整備份</button>
+<label class="backup-btn secondary">匯入備份<input id="importBackup" type="file" accept=".json,application/json" hidden></label>
+<p class="backup-note">清除 Safari 網站資料、換手機或換瀏覽器前，建議先匯出備份。</p>
+</div>
+</section>
+</div>
+
 </main>
 <div class="footer">交通備註預設收合，點開即可查看上下車站、轉乘與出口；實際以現場指標與即時導航為準。</div>
 <script src="./assets/app.js"></script>
