@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f4efe9">
+  <title>OSAKA 2026｜Janice's Journey</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="stylesheet" href="./assets/app.css">
+</head>
+<body>
+  <div id="boot" class="boot">正在讀取 Osaka 2026…</div>
+
+  <div id="app" class="hidden">
+    <header class="hero">
+      <div class="hero-shade"></div>
+      <div class="hero-inner">
+        <div class="eyebrow">TRAVEL COMPANION V3.1.0</div>
+        <h1>OSAKA 2026<br><span>Janice’s Journey</span></h1>
+        <p id="tripDates">2026.08.12—08.17｜6天5夜</p>
+
+        <div class="hero-grid">
+          <div class="hero-chip">
+            <small>去程</small>
+            <b>BR176</b>
+            <span>14:20 桃園 T2 → 18:00 神戶 T2</span>
+          </div>
+          <div class="hero-chip">
+            <small>回程</small>
+            <b>BR175</b>
+            <span>19:00 神戶 T2 → 20:55 桃園 T2</span>
+          </div>
+        </div>
+        <div id="syncBar" class="sync-bar hidden">
+          <span id="syncStatus">本機模式</span>
+          <button id="syncNow">立即同步</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section id="homePage" class="page active">
+        <div class="dashboard-grid">
+          <article class="metric-card">
+            <small>COUNTDOWN</small>
+            <strong id="countdown">—</strong>
+            <span>距離出發</span>
+          </article>
+          <article class="metric-card">
+            <small>TODAY</small>
+            <strong id="todayLabel">行前準備</strong>
+            <span id="todaySummary">整理票券與必買清單</span>
+          </article>
+        </div>
+
+        <section class="panel">
+          <div class="section-head">
+            <div><small>6-DAY FORECAST</small><h2>六天天氣</h2></div>
+            <button id="refreshWeather" class="text-btn">更新</button>
+          </div>
+          <div id="forecastStrip" class="forecast-strip"></div>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <div><small>HOTEL</small><h2>住宿資訊</h2></div>
+          </div>
+          <article id="hotelCard" class="hotel-card"></article>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <div><small>QUICK ACCESS</small><h2>快速入口</h2></div>
+          </div>
+          <div class="quick-grid">
+            <button data-page-target="itineraryPage">查看每日行程</button>
+            <button data-page-target="todayPage">今日快速模式</button>
+            <a target="_blank" href="https://www.google.com/maps/search/?api=1&query=Sotetsu+Fresa+Inn+Osaka+Shinsaibashi">飯店導航</a>
+            <button id="exportData">匯出旅程 JSON</button>
+          </div>
+        </section>
+      </section>
+
+      <section id="todayPage" class="page">
+        <div class="page-head">
+          <div><small>TODAY MODE</small><h2>今日快速模式</h2></div>
+        </div>
+        <div id="todayWeather"></div>
+        <div id="todayItems"></div>
+      </section>
+
+      <section id="itineraryPage" class="page">
+        <div class="page-head">
+          <div><small>ITINERARY</small><h2>每日行程</h2></div>
+        </div>
+        <div id="dayTabs" class="day-tabs"></div>
+        <div id="dayContent"></div>
+      </section>
+
+      <section id="mapPage" class="page">
+        <div class="page-head">
+          <div><small>MAP LINKS</small><h2>行程地圖</h2></div>
+        </div>
+        <p class="page-intro">依日期整理所有地點，可直接開啟 Google Maps。</p>
+        <div id="mapList"></div>
+      </section>
+
+
+      <section id="toolsPage" class="page">
+        <div class="page-head">
+          <div><small>TRAVEL TOOLS</small><h2>旅行工具</h2></div>
+        </div>
+
+        <div class="tool-tabs">
+          <button data-tool="favoriteTool" class="active">收藏</button>
+          <button data-tool="shoppingTool">必買</button>
+          <button data-tool="luggageTool">行李</button>
+          <button data-tool="diaryTool">日記</button>
+          <button data-tool="assistantTool">AI 助手</button>
+        </div>
+
+        <section id="favoriteTool" class="tool-panel active">
+          <div class="section-head"><div><small>FAVORITES</small><h3>收藏景點</h3></div></div>
+          <div id="favoriteList"></div>
+        </section>
+
+        <section id="shoppingTool" class="tool-panel">
+          <div class="section-head"><div><small>SHOPPING</small><h3>必買清單</h3></div><button id="addShopping" class="small-action">新增</button></div>
+          <div id="shoppingStats" class="mini-stats"></div>
+          <div id="shoppingList"></div>
+        </section>
+
+        <section id="luggageTool" class="tool-panel">
+          <div class="section-head"><div><small>LUGGAGE</small><h3>行李清單</h3></div><button id="addLuggage" class="small-action">新增</button></div>
+          <div id="luggageLists"></div>
+        </section>
+
+        <section id="diaryTool" class="tool-panel">
+          <div class="section-head"><div><small>TRAVEL DIARY</small><h3>旅遊日記</h3></div><button id="addDiary" class="small-action">新增</button></div>
+          <div id="diaryList"></div>
+        </section>
+
+        <section id="assistantTool" class="tool-panel">
+          <div class="section-head"><div><small>AI ASSISTANT</small><h3>AI 行程助手</h3></div></div>
+          <p class="privacy-note">此功能不會傳送私人資料；只會依你選擇的日期產生文字提示。</p>
+          <div class="assistant-box">
+            <label>選擇日期</label>
+            <select id="assistantDay"></select>
+            <label>想詢問的內容</label>
+            <textarea id="assistantQuestion" placeholder="例如：下雨時如何調整行程？"></textarea>
+            <button id="copyAssistantPrompt" class="primary-action">複製提示並開啟 ChatGPT</button>
+          </div>
+        </section>
+
+        <section class="panel converter-panel">
+          <div class="section-head"><div><small>CURRENCY</small><h3>日圓換算</h3></div></div>
+          <div class="converter-grid">
+            <label>日圓<input id="yenInput" inputmode="decimal" value="1000"></label>
+            <label>參考匯率<input id="rateInput" inputmode="decimal" value="0.205"></label>
+            <div><small>台幣參考</small><strong id="twdOutput">NT$205</strong></div>
+          </div>
+        </section>
+      </section>
+
+      <section id="morePage" class="page">
+        <div class="page-head">
+          <div><small>CLOUD & SHARE</small><h2>同步與分享</h2></div>
+        </div>
+
+        <section id="noTripPanel" class="panel">
+          <h3>建立私人雲端旅程</h3>
+          <p class="muted">建立後會產生私人編輯網址與唯讀分享網址，不需登入。</p>
+          <button id="createCloudTrip" class="primary-action">建立私人旅程</button>
+          <div class="join-box">
+            <label>已有私人編輯網址</label>
+            <input id="joinTripUrl" placeholder="貼上完整網址">
+            <button id="joinTrip" class="secondary-action">開啟網址</button>
+          </div>
+        </section>
+
+        <section id="tripManagePanel" class="panel hidden">
+          <div class="manage-list">
+            <button id="copyEditLink">複製私人編輯網址</button>
+            <button id="copyReadLink">複製唯讀分享網址</button>
+            <button id="exportState">匯出修改資料 JSON</button>
+            <label class="file-action">匯入修改資料 JSON<input id="importState" type="file" accept=".json,application/json" hidden></label>
+            <button id="clearEdits" class="danger-action">清除所有個人修改</button>
+          </div>
+          <p class="privacy-note">私人編輯網址等同密碼。唯讀網址只顯示首頁、行程與地圖。</p>
+        </section>
+      </section>
+
+    </main>
+
+    <nav id="bottomNav" class="bottom-nav"></nav>
+  </div>
+
+
+  <dialog id="editDialog">
+    <form id="editForm" method="dialog">
+      <div class="dialog-head">
+        <h3 id="editTitle">編輯</h3>
+        <button value="cancel" class="close-dialog">×</button>
+      </div>
+      <div id="editFields"></div>
+      <menu>
+        <button value="cancel" class="secondary-action">取消</button>
+        <button id="saveEdit" value="default" class="primary-action">儲存</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <script defer src="./assets/app.js?v=310"></script>
+</body>
+</html>

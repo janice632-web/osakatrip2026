@@ -1,0 +1,48 @@
+{
+  "defaultItems": [
+    {
+      "id": "buy-conan",
+      "name": "柯南限定周邊",
+      "category": "動漫周邊",
+      "recipient": "自己",
+      "amount": 0,
+      "place": "USJ／讀賣電視台",
+      "day": 4,
+      "time": "18:30",
+      "note": "先確認限購與庫存"
+    },
+    {
+      "id": "buy-nintendo",
+      "name": "任天堂限定商品",
+      "category": "動漫周邊",
+      "recipient": "自己",
+      "amount": 0,
+      "place": "Nintendo OSAKA",
+      "day": 5,
+      "time": "10:30",
+      "note": "依現場庫存決定"
+    },
+    {
+      "id": "buy-drugstore",
+      "name": "日本藥妝",
+      "category": "藥妝美妝",
+      "recipient": "自己",
+      "amount": 0,
+      "place": "心齋橋",
+      "day": 6,
+      "time": "10:00",
+      "note": "最後一天補買"
+    },
+    {
+      "id": "buy-souvenir",
+      "name": "大阪伴手禮",
+      "category": "食品伴手禮",
+      "recipient": "同事／家人",
+      "amount": 0,
+      "place": "梅田／心齋橋",
+      "day": 5,
+      "time": "13:30",
+      "note": "確認保存期限"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+PASS
+- JavaScript 語法檢查通過
+- 所有 JSON 可解析
+- index.html 引用正確
+- PWA 圖示存在
+- Day 1 飯店 Check-in 存在
+- 大阪城 Road Train 存在
+- Day 6 Plan B 存在
+- BR175 回程存在
