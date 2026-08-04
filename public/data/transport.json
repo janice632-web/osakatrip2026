@@ -1,0 +1,29 @@
+{
+  "shinkiBus": {
+    "outbound": {
+      "date": "2026-08-12",
+      "departure": "19:20",
+      "from": "神戶機場第二航廈",
+      "to": "心齋橋（長堀通）"
+    },
+    "returnPlanA": {
+      "date": "2026-08-17",
+      "departure": "16:00",
+      "from": "心齋橋（長堀通）",
+      "to": "神戶機場第二航廈"
+    },
+    "returnPlanB": {
+      "date": "2026-08-17",
+      "departure": "08:30",
+      "from": "心齋橋（長堀通）",
+      "to": "神戶機場第二航廈"
+    }
+  },
+  "osakaCastleRoadTrain": {
+    "boardingPoint": "JO-TERRACE OSAKA／大阪城公園站側",
+    "backupPoint": "森之宮側",
+    "dropOffPoint": "極樂橋周邊",
+    "price": "依當日公告",
+    "operationHours": "依當日公告"
+  }
+}

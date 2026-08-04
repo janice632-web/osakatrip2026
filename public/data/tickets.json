@@ -1,0 +1,34 @@
+{
+  "items": [
+    {
+      "id": "ticket-br176",
+      "name": "BR176",
+      "type": "flight",
+      "sensitive": false
+    },
+    {
+      "id": "ticket-br175",
+      "name": "BR175",
+      "type": "flight",
+      "sensitive": false
+    },
+    {
+      "id": "ticket-usj",
+      "name": "USJ 門票",
+      "type": "admission",
+      "sensitive": true
+    },
+    {
+      "id": "ticket-express",
+      "name": "USJ Express Pass",
+      "type": "express-pass",
+      "sensitive": true
+    },
+    {
+      "id": "ticket-shinki",
+      "name": "神姬巴士資訊",
+      "type": "transport",
+      "sensitive": false
+    }
+  ]
+}

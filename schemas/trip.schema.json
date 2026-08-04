@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Travel Companion Trip",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "trip",
+    "flights",
+    "days"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string"
+    },
+    "trip": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "startDate",
+        "endDate"
+      ]
+    },
+    "flights": {
+      "type": "array"
+    },
+    "days": {
+      "type": "array",
+      "minItems": 6
+    }
+  }
+}

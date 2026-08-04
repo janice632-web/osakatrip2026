@@ -1,0 +1,14 @@
+{
+  "items": [
+    {
+      "id": "wish-otori",
+      "name": "大鳥大社",
+      "type": "神社寺廟",
+      "day": null,
+      "time": null,
+      "priority": "中",
+      "mapsQuery": "Otori Taisha Osaka",
+      "note": "尚未排入固定行程，需再確認動線"
+    }
+  ]
+}

@@ -1,0 +1,477 @@
+{
+  "schemaVersion": "2.0.0",
+  "trip": {
+    "id": "osaka-2026",
+    "title": "OSAKA 2026｜Janice's Journey",
+    "startDate": "2026-08-12",
+    "endDate": "2026-08-17",
+    "days": 6,
+    "nights": 5,
+    "timezone": "Asia/Tokyo",
+    "currency": "JPY"
+  },
+  "flights": [
+    {
+      "flight": "BR176",
+      "date": "2026-08-12",
+      "from": "TPE T2",
+      "to": "UKB T2",
+      "departure": "14:20",
+      "arrival": "18:00"
+    },
+    {
+      "flight": "BR175",
+      "date": "2026-08-17",
+      "from": "UKB T2",
+      "to": "TPE T2",
+      "departure": "19:00",
+      "arrival": "20:55"
+    }
+  ],
+  "hotelRef": "sotetsu-fresa-shinsaibashi",
+  "days": [
+    {
+      "day": 1,
+      "date": "2026-08-12",
+      "city": "大阪",
+      "title": "抵達大阪",
+      "weather": {
+        "location": "Osaka",
+        "status": "dynamic",
+        "source": "Open-Meteo"
+      },
+      "items": [
+        {
+          "id": "d1-br176",
+          "time": "14:20",
+          "title": "BR176 桃園起飛",
+          "place": "桃園國際機場第二航廈",
+          "summary": "建議至少提前 2 小時抵達機場。",
+          "mapsQuery": "Taoyuan International Airport Terminal 2",
+          "details": {
+            "departure": "14:20 台灣時間",
+            "arrival": "18:00 日本時間"
+          }
+        },
+        {
+          "id": "d1-airport",
+          "time": "18:00",
+          "title": "抵達神戶機場 T2",
+          "place": "神戶機場第二航廈",
+          "summary": "入境、領行李後前往神姬巴士站。",
+          "mapsQuery": "Kobe Airport Terminal 2"
+        },
+        {
+          "id": "d1-bus",
+          "time": "19:20",
+          "title": "搭神姬巴士前往心齋橋",
+          "place": "神戶機場第二航廈巴士站",
+          "summary": "直達心齋橋，避免拖行李轉車。",
+          "mapsQuery": "Kobe Airport Terminal 2 bus stop",
+          "details": {
+            "arrivalTime": "約 20:21",
+            "dropOff": "心齋橋（長堀通）"
+          }
+        },
+        {
+          "id": "d1-hotel",
+          "time": "20:35",
+          "title": "飯店 Check-in",
+          "place": "相鐵 FRESA INN 大阪心齋橋",
+          "summary": "入住後只安排附近晚餐與補給。",
+          "mapsQuery": "Sotetsu Fresa Inn Osaka Shinsaibashi",
+          "transport": {
+            "from": "心齋橋（長堀通）巴士下車點",
+            "mode": "步行"
+          }
+        },
+        {
+          "id": "d1-dotonbori",
+          "time": "21:10",
+          "title": "道頓堀晚餐與補給",
+          "place": "道頓堀／心齋橋",
+          "summary": "依體力決定是否前往。",
+          "mapsQuery": "Dotonbori Osaka"
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "date": "2026-08-13",
+      "city": "大阪",
+      "title": "大阪城 × 讀賣電視台 × 阿倍野",
+      "weather": {
+        "location": "Osaka",
+        "status": "dynamic",
+        "source": "Open-Meteo"
+      },
+      "items": [
+        {
+          "id": "d2-morinomiya",
+          "time": "08:30",
+          "title": "前往大阪城公園",
+          "place": "森之宮站",
+          "summary": "心齋橋搭 Metro，於本町轉中央線。",
+          "mapsQuery": "Morinomiya Station",
+          "transport": {
+            "boarding": "心齋橋站 M19",
+            "transfer": "本町站",
+            "arrival": "森之宮站 C19",
+            "exit": "1號、3A 或 3B 出口",
+            "walkingMinutes": 8
+          }
+        },
+        {
+          "id": "d2-road-train",
+          "time": "09:15",
+          "title": "大阪城 Road Train",
+          "place": "JO-TERRACE OSAKA",
+          "summary": "搭至極樂橋周邊，減少夏季步行。",
+          "mapsQuery": "JO-TERRACE OSAKA Road Train",
+          "details": {
+            "boardingPoint": "JO-TERRACE OSAKA／大阪城公園站側",
+            "backupPoint": "森之宮側",
+            "dropOffPoint": "極樂橋周邊",
+            "price": "依當日公告",
+            "operationHours": "依當日公告"
+          }
+        },
+        {
+          "id": "d2-castle",
+          "time": "10:00",
+          "title": "大阪城天守閣",
+          "place": "大阪城天守閣",
+          "summary": "建議停留 60～90 分鐘。",
+          "mapsQuery": "Osaka Castle Main Tower"
+        },
+        {
+          "id": "d2-ytv",
+          "time": "13:15",
+          "title": "讀賣電視台",
+          "place": "讀賣電視台新社屋",
+          "summary": "拍攝柯南銅像與展示。",
+          "mapsQuery": "Yomiuri Telecasting Corporation Osaka",
+          "transport": {
+            "from": "大阪城天守閣",
+            "mode": "步行或短程計程車",
+            "walkingMinutes": 25,
+            "nearestStation": "京橋站"
+          }
+        },
+        {
+          "id": "d2-tennoji",
+          "time": "15:30",
+          "title": "天王寺／阿倍野逛街與咖啡",
+          "place": "阿倍野 HARUKAS",
+          "summary": "先逛百貨，再安排咖啡休息。",
+          "mapsQuery": "Abeno Harukas",
+          "transport": {
+            "boarding": "京橋站",
+            "route": "JR 大阪環狀線外回",
+            "arrival": "天王寺站",
+            "exit": "JR 中央口／南口；Metro 往 9、10 號出口"
+          },
+          "details": {
+            "cafes": [
+              "Blue Bottle Coffee Tennoji",
+              "堀內果實園 阿倍野HARUKAS店"
+            ]
+          }
+        },
+        {
+          "id": "d2-harukas",
+          "time": "17:45",
+          "title": "HARUKAS 300",
+          "place": "HARUKAS 300",
+          "summary": "看夕陽與夜景，活動依官方公告。",
+          "mapsQuery": "HARUKAS 300"
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "date": "2026-08-14",
+      "city": "京都",
+      "title": "京都經典四景一日遊",
+      "weather": {
+        "location": "Kyoto",
+        "status": "dynamic",
+        "source": "Open-Meteo"
+      },
+      "items": [
+        {
+          "id": "d3-meeting",
+          "time": "07:10",
+          "title": "前往一日遊集合點",
+          "place": "大阪站或難波 OCAT",
+          "summary": "依訂單集合點，提前至少 15 分鐘抵達。",
+          "mapsQuery": "OCAT Osaka"
+        },
+        {
+          "id": "d3-arashiyama",
+          "time": "上午",
+          "title": "嵐山",
+          "place": "嵐山",
+          "summary": "竹林、渡月橋與自由午餐。",
+          "mapsQuery": "Arashiyama Kyoto"
+        },
+        {
+          "id": "d3-kinkakuji",
+          "time": "下午",
+          "title": "金閣寺",
+          "place": "金閣寺",
+          "summary": "依導遊集合時間活動。",
+          "mapsQuery": "Kinkakuji"
+        },
+        {
+          "id": "d3-kiyomizu",
+          "time": "下午",
+          "title": "清水寺",
+          "place": "清水寺",
+          "summary": "注意坡道與高溫。",
+          "mapsQuery": "Kiyomizudera"
+        },
+        {
+          "id": "d3-fushimi",
+          "time": "傍晚",
+          "title": "伏見稻荷",
+          "place": "伏見稻荷大社",
+          "summary": "走千本鳥居前段即可。",
+          "mapsQuery": "Fushimi Inari Taisha"
+        }
+      ]
+    },
+    {
+      "day": 4,
+      "date": "2026-08-15",
+      "city": "大阪",
+      "title": "USJ",
+      "weather": {
+        "location": "Osaka",
+        "status": "dynamic",
+        "source": "Open-Meteo"
+      },
+      "items": [
+        {
+          "id": "d4-depart",
+          "time": "06:30",
+          "title": "前往 USJ",
+          "place": "Universal City Station",
+          "summary": "提早抵達，依 App 排隊時間調整。",
+          "mapsQuery": "Universal City Station",
+          "transport": {
+            "boarding": "心齋橋站",
+            "transfer": "梅田／大阪站、西九條站",
+            "arrival": "Universal City 站"
+          }
+        },
+        {
+          "id": "d4-conan",
+          "time": "13:00",
+          "title": "名偵探柯南 4-D Live Show",
+          "place": "USJ",
+          "summary": "場次依 USJ App／現場公告。",
+          "mapsQuery": "Detective Conan 4-D Live Show USJ"
+        },
+        {
+          "id": "d4-mario",
+          "time": "16:30",
+          "title": "Mario Kart",
+          "place": "SUPER NINTENDO WORLD",
+          "summary": "Express Pass 16:30～17:00。",
+          "mapsQuery": "Mario Kart Koopa's Challenge USJ"
+        },
+        {
+          "id": "d4-minecart",
+          "time": "17:00",
+          "title": "Mine Cart Madness",
+          "place": "SUPER NINTENDO WORLD",
+          "summary": "Express Pass 17:00～17:30。",
+          "mapsQuery": "Mine Cart Madness USJ"
+        },
+        {
+          "id": "d4-jurassic",
+          "time": "彈性",
+          "title": "Jurassic Park – The Ride",
+          "place": "USJ",
+          "summary": "依快通與動線安排。",
+          "mapsQuery": "Jurassic Park The Ride USJ"
+        },
+        {
+          "id": "d4-harrypotter",
+          "time": "彈性",
+          "title": "Harry Potter and the Forbidden Journey",
+          "place": "USJ",
+          "summary": "依快通與動線安排。",
+          "mapsQuery": "Harry Potter and the Forbidden Journey USJ"
+        }
+      ]
+    },
+    {
+      "day": 5,
+      "date": "2026-08-16",
+      "city": "大阪",
+      "title": "梅田購物日",
+      "weather": {
+        "location": "Osaka",
+        "status": "dynamic",
+        "source": "Open-Meteo"
+      },
+      "items": [
+        {
+          "id": "d5-umeda",
+          "time": "09:30",
+          "title": "前往梅田",
+          "place": "梅田站",
+          "summary": "心齋橋搭御堂筋線直達。",
+          "mapsQuery": "Umeda Station",
+          "transport": {
+            "boarding": "心齋橋站 M19",
+            "arrival": "梅田站 M16",
+            "exit": "Nintendo／LUCUA 往 JR大阪站／大丸梅田"
+          }
+        },
+        {
+          "id": "d5-nintendo",
+          "time": "10:00",
+          "title": "Nintendo OSAKA",
+          "place": "大丸梅田店 13F",
+          "summary": "週日人潮多，優先前往。",
+          "mapsQuery": "Nintendo OSAKA"
+        },
+        {
+          "id": "d5-pokemon",
+          "time": "11:00",
+          "title": "Pokémon Center Osaka",
+          "place": "大丸梅田店 13F",
+          "summary": "與 Nintendo 同棟。",
+          "mapsQuery": "Pokemon Center Osaka"
+        },
+        {
+          "id": "d5-lucua",
+          "time": "12:00",
+          "title": "LUCUA Osaka",
+          "place": "LUCUA Osaka",
+          "summary": "午餐、服飾、美妝與生活選物。",
+          "mapsQuery": "LUCUA Osaka"
+        },
+        {
+          "id": "d5-yodobashi",
+          "time": "14:00",
+          "title": "Yodobashi Umeda",
+          "place": "Yodobashi Umeda",
+          "summary": "電器、美容家電、模型與玩具。",
+          "mapsQuery": "Yodobashi Camera Multimedia Umeda"
+        },
+        {
+          "id": "d5-cafe",
+          "time": "15:30",
+          "title": "梅田咖啡休息",
+          "place": "Blue Bottle Coffee Umeda Chayamachi",
+          "summary": "備選 café Kitsuné。",
+          "mapsQuery": "Blue Bottle Coffee Umeda Chayamachi"
+        },
+        {
+          "id": "d5-grandfront",
+          "time": "16:30",
+          "title": "Grand Front／HEP FIVE",
+          "place": "梅田商圈",
+          "summary": "依體力決定是否加梅田藍天大廈。",
+          "mapsQuery": "Grand Front Osaka"
+        }
+      ]
+    },
+    {
+      "day": 6,
+      "date": "2026-08-17",
+      "city": "神戶",
+      "title": "回程日雙方案",
+      "weather": {
+        "location": "Kobe",
+        "status": "dynamic",
+        "source": "Open-Meteo"
+      },
+      "plans": [
+        {
+          "id": "day6-plan-a",
+          "name": "Plan A｜心齋橋最後採買",
+          "items": [
+            {
+              "id": "d6a-shopping",
+              "time": "09:00",
+              "title": "心齋橋最後採買",
+              "place": "心齋橋筋商店街",
+              "summary": "補買藥妝與伴手禮。",
+              "mapsQuery": "Shinsaibashi-suji Shopping Street"
+            },
+            {
+              "id": "d6a-bus",
+              "time": "16:00",
+              "title": "搭神姬巴士前往神戶機場",
+              "place": "心齋橋（長堀通）",
+              "summary": "約 17:01 抵達神戶機場 T2。",
+              "mapsQuery": "心斎橋 長堀通 神姫バス",
+              "transport": {
+                "boarding": "心齋橋（長堀通）",
+                "arrival": "神戶機場第二航廈"
+              }
+            }
+          ]
+        },
+        {
+          "id": "day6-plan-b",
+          "name": "Plan B｜神戶半日遊備案",
+          "items": [
+            {
+              "id": "d6b-bus",
+              "time": "08:30",
+              "title": "搭神姬巴士前往神戶機場",
+              "place": "心齋橋（長堀通）",
+              "summary": "約 09:31 抵達，先寄放行李。",
+              "mapsQuery": "心斎橋 長堀通 神姫バス"
+            },
+            {
+              "id": "d6b-portliner",
+              "time": "10:00",
+              "title": "Port Liner 前往三宮",
+              "place": "神戶機場站",
+              "summary": "前往南京町、舊居留地與美利堅公園。",
+              "mapsQuery": "Kobe Airport Station",
+              "transport": {
+                "boarding": "神戶機場站",
+                "route": "Port Liner",
+                "arrival": "三宮站"
+              }
+            },
+            {
+              "id": "d6b-city",
+              "time": "10:40",
+              "title": "南京町／舊居留地／美利堅公園",
+              "place": "神戶市區",
+              "summary": "以散步與拍照為主。",
+              "mapsQuery": "Kobe Nankinmachi"
+            },
+            {
+              "id": "d6b-return",
+              "time": "15:30",
+              "title": "最晚返回神戶機場",
+              "place": "三宮站",
+              "summary": "取行李並辦理報到。",
+              "mapsQuery": "Sannomiya Station"
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "id": "d6-flight",
+          "time": "19:00",
+          "title": "BR175 神戶起飛",
+          "place": "神戶機場第二航廈",
+          "summary": "20:55 抵達桃園 T2。",
+          "mapsQuery": "Kobe Airport Terminal 2"
+        }
+      ]
+    }
+  ]
+}
