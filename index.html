@@ -15,7 +15,7 @@
     <header class="hero">
       <div class="hero-shade"></div>
       <div class="hero-inner">
-        <div class="eyebrow">TRAVEL COMPANION V2.0.0</div>
+        <div class="eyebrow">TRAVEL COMPANION V2.0.1</div>
         <h1>OSAKA 2026<br><span>Janice’s Journey</span></h1>
         <p id="tripDates">2026.08.12—08.17｜6天5夜</p>
 
@@ -30,6 +30,10 @@
             <b>BR175</b>
             <span>19:00 神戶 T2 → 20:55 桃園 T2</span>
           </div>
+        </div>
+        <div id="syncBar" class="sync-bar hidden">
+          <span id="syncStatus">本機模式</span>
+          <button id="syncNow">立即同步</button>
         </div>
       </div>
     </header>
@@ -92,15 +96,63 @@
         <div id="dayTabs" class="day-tabs"></div>
         <div id="dayContent"></div>
       </section>
+
+      <section id="mapPage" class="page">
+        <div class="page-head">
+          <div><small>MAP LINKS</small><h2>行程地圖</h2></div>
+        </div>
+        <p class="page-intro">依日期整理所有地點，可直接開啟 Google Maps。</p>
+        <div id="mapList"></div>
+      </section>
+
+      <section id="morePage" class="page">
+        <div class="page-head">
+          <div><small>CLOUD & SHARE</small><h2>同步與分享</h2></div>
+        </div>
+
+        <section id="noTripPanel" class="panel">
+          <h3>建立私人雲端旅程</h3>
+          <p class="muted">建立後會產生私人編輯網址與唯讀分享網址，不需登入。</p>
+          <button id="createCloudTrip" class="primary-action">建立私人旅程</button>
+          <div class="join-box">
+            <label>已有私人編輯網址</label>
+            <input id="joinTripUrl" placeholder="貼上完整網址">
+            <button id="joinTrip" class="secondary-action">開啟網址</button>
+          </div>
+        </section>
+
+        <section id="tripManagePanel" class="panel hidden">
+          <div class="manage-list">
+            <button id="copyEditLink">複製私人編輯網址</button>
+            <button id="copyReadLink">複製唯讀分享網址</button>
+            <button id="exportState">匯出修改資料 JSON</button>
+            <label class="file-action">匯入修改資料 JSON<input id="importState" type="file" accept=".json,application/json" hidden></label>
+            <button id="clearEdits" class="danger-action">清除所有個人修改</button>
+          </div>
+          <p class="privacy-note">私人編輯網址等同密碼。唯讀網址只顯示首頁、行程與地圖。</p>
+        </section>
+      </section>
+
     </main>
 
-    <nav class="bottom-nav">
-      <button data-page="homePage" class="active"><span>⌂</span>首頁</button>
-      <button data-page="todayPage"><span>◎</span>今日</button>
-      <button data-page="itineraryPage"><span>▣</span>行程</button>
-    </nav>
+    <nav id="bottomNav" class="bottom-nav"></nav>
   </div>
 
-  <script type="module" src="./assets/app.m2.js"></script>
+
+  <dialog id="editDialog">
+    <form id="editForm" method="dialog">
+      <div class="dialog-head">
+        <h3 id="editTitle">編輯</h3>
+        <button value="cancel" class="close-dialog">×</button>
+      </div>
+      <div id="editFields"></div>
+      <menu>
+        <button value="cancel" class="secondary-action">取消</button>
+        <button id="saveEdit" value="default" class="primary-action">儲存</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <script type="module" src="./assets/app.v201.js"></script>
 </body>
 </html>
