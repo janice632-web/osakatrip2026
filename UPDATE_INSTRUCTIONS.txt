@@ -1,22 +1,16 @@
-V3.3 智慧行程補丁
+V3.3.1 依時間排序修正
 
-覆蓋／新增：
-- assets/app.js
-- assets/app.css
+覆蓋：
 - assets/smart-route.js
-- assets/trip-health.js
+- assets/app.css
 - index.html
 - service-worker.js
 
-不要覆蓋 public/data、icons、SUPABASE_SETUP.sql。
+修正：
+- 支援上午、下午、傍晚、晚上、全天、彈性等時間
+- 排序成功顯示提示
+- 已是正確順序時顯示提示
+- 更新快取版本
 
-功能：
-- 依時間排序
-- 智慧路線排序
-- 固定時間／釘選行程
-- 還原排序
-- 行程健檢
-- 今日提醒
-- 資料升級至版本 5，保留住宿、照片、代購、行前準備與既有排序
-
-Commit：V3.3 smart route and trip health
+Commit：
+V3.3.1 time sort feedback fix

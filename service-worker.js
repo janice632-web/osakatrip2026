@@ -1,4 +1,4 @@
-const CACHE_NAME = 'travel-companion-v3-3-0-smart1';
+const CACHE_NAME = 'travel-companion-v3-3-1-timesort1';
 const APP_SHELL = [
   './',
   './index.html',
