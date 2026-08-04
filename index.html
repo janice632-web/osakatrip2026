@@ -17,7 +17,7 @@
     <header class="hero">
       <div class="hero-shade"></div>
       <div class="hero-inner">
-        <div class="eyebrow">TRAVEL COMPANION V3.2.0</div>
+        <div class="eyebrow">TRAVEL COMPANION V3.3.0</div>
         <h1>OSAKA 2026<br><span>Janice’s Journey</span></h1>
         <p id="tripDates">2026.08.12—08.17｜6天5夜</p>
 
@@ -61,6 +61,11 @@
             <button id="refreshWeather" class="text-btn">更新</button>
           </div>
           <div id="forecastStrip" class="forecast-strip"></div>
+        </section>
+
+        <section id="todayReminderPanel" class="panel hidden">
+          <div class="section-head"><div><small>TODAY REMINDER</small><h2>今日提醒</h2></div></div>
+          <div id="todayReminder"></div>
         </section>
 
         <section class="panel">
@@ -204,6 +209,8 @@
     </form>
   </dialog>
 
-  <script defer src="./assets/app.js?v=320-preserve1"></script>
+  <script defer src="./assets/smart-route.js?v=330-smart1"></script>
+  <script defer src="./assets/trip-health.js?v=330-smart1"></script>
+  <script defer src="./assets/app.js?v=330-smart1"></script>
 </body>
 </html>

@@ -1,21 +1,22 @@
-V3.2 資料保留更新
+V3.3 智慧行程補丁
 
-只覆蓋以下 4 個檔案：
+覆蓋／新增：
 - assets/app.js
 - assets/app.css
+- assets/smart-route.js
+- assets/trip-health.js
 - index.html
 - service-worker.js
 
-不要刪除或覆蓋：
-- public/data/
-- icons/
-- SUPABASE_SETUP.sql
+不要覆蓋 public/data、icons、SUPABASE_SETUP.sql。
 
-資料保護：
-- 原有 Supabase payload 不清空
-- 原有 localStorage 修改會先建立時間戳備份
-- 新欄位只在缺少時補入
-- 行程、住宿、照片、排序與自訂資料會保留
+功能：
+- 依時間排序
+- 智慧路線排序
+- 固定時間／釘選行程
+- 還原排序
+- 行程健檢
+- 今日提醒
+- 資料升級至版本 5，保留住宿、照片、代購、行前準備與既有排序
 
-Commit:
-V3.2 preserve-data update
+Commit：V3.3 smart route and trip health

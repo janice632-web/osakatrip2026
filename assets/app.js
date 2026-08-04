@@ -34,7 +34,7 @@ let tripId=params.get("trip"), editToken=params.get("key"), readToken=params.get
 let readonly=!!readToken&&!editToken;
 let trip,hotel,activeDay=1,weatherCache={},cloudTimer=null,lastCloudUpdated=null;
 let edits={
-  version:4,
+  version:5,
   itemOverrides:{},
   hiddenItems:[],
   addedItems:[],
@@ -98,6 +98,9 @@ function migrateEdits(raw){
     hotelBooking:{},
     selectedDay6Plan:0,
     dayOrders:{},
+    originalDayOrders:{},
+    routeFixed:{},
+    routeCoordinates:{},
     prepItems:[
       {id:"prep-passport",name:"護照",done:false},
       {id:"prep-vjw",name:"Visit Japan Web",done:false},
@@ -115,11 +118,14 @@ function migrateEdits(raw){
   next.itemOverrides={...defaults.itemOverrides,...(previous.itemOverrides||{})};
   next.hotelBooking={...defaults.hotelBooking,...(previous.hotelBooking||{})};
   next.dayOrders={...defaults.dayOrders,...(previous.dayOrders||{})};
+  next.originalDayOrders={...defaults.originalDayOrders,...(previous.originalDayOrders||{})};
+  next.routeFixed={...defaults.routeFixed,...(previous.routeFixed||{})};
+  next.routeCoordinates={...defaults.routeCoordinates,...(previous.routeCoordinates||{})};
   next.hiddenItems=Array.isArray(previous.hiddenItems)?previous.hiddenItems:[];
   next.addedItems=Array.isArray(previous.addedItems)?previous.addedItems:[];
   next.prepItems=Array.isArray(previous.prepItems)&&previous.prepItems.length?previous.prepItems:defaults.prepItems;
   next.shopping=Array.isArray(previous.shopping)?previous.shopping:[];
-  next.version=4;
+  next.version=5;
   return next;
 }
 
@@ -245,10 +251,15 @@ function renderTabs(){
 function renderDay(dayNo,planIndex=edits.selectedDay6Plan||0){
   const d=trip.days.find(x=>x.day===dayNo);
   if(d.plans?.length)edits.selectedDay6Plan=planIndex;
+  window.currentRenderedDay=d;
+  window.currentRenderedPlan=planIndex;
   let planSwitch=d.plans?.length?`<div class="plan-switch">${d.plans.map((p,i)=>`<button data-plan="${i}" class="${i===planIndex?"active":""}">${esc(p.name)}</button>`).join("")}</div>`:"";
   const items=itemsForDay(d,planIndex);
-  $("#dayContent").innerHTML=`<div class="day-header"><small>DAY ${d.day} · ${d.date.replaceAll("-","/")}</small><h3>${esc(d.title)}</h3><p>${esc(d.city)}</p></div>${weatherHtml(d)}${planSwitch}<div id="sortableCards" data-day="${d.day}" data-plan="${planIndex}">${items.map((x,i)=>placeCard(x,items[i+1],i,items.length)).join("")}</div>${!readonly?`<button class="primary-action" onclick="addItem(${dayNo})">新增 Day ${dayNo} 行程</button>`:""}`;
+  const smartTools=!readonly&&window.renderSmartSortToolbar?window.renderSmartSortToolbar(d,planIndex,items):"";
+  const health=window.renderTripHealth?window.renderTripHealth(d,planIndex,items):"";
+  $("#dayContent").innerHTML=`<div class="day-header"><small>DAY ${d.day} · ${d.date.replaceAll("-","/")}</small><h3>${esc(d.title)}</h3><p>${esc(d.city)}</p>${smartTools}</div>${weatherHtml(d)}${planSwitch}${health}<div id="sortableCards" data-day="${d.day}" data-plan="${planIndex}">${items.map((x,i)=>placeCard(x,items[i+1],i,items.length)).join("")}</div>${!readonly?`<button class="primary-action" onclick="addItem(${dayNo})">新增 Day ${dayNo} 行程</button>`:""}`;
   bindCards();
+  if(window.bindSmartSortToolbar)window.bindSmartSortToolbar(d,planIndex,items);
   $$(".plan-switch button").forEach(b=>b.onclick=()=>{edits.selectedDay6Plan=Number(b.dataset.plan);persistLocal();renderDay(dayNo,Number(b.dataset.plan))});
 }
 function placeCard(x,next,index,total){
@@ -269,6 +280,7 @@ function placeCard(x,next,index,total){
     </div>
     ${x.image?`<img class="user-image" src="${x.image}" loading="lazy">`:""}
     ${!readonly?`<div class="edit-tools">
+      <button class="${edits.routeFixed?.[x.id]?"fixed-active":""}" onclick="toggleRouteFixed('${x.id}')">${edits.routeFixed?.[x.id]?"📌 已固定":"📍 固定"}</button>
       <button onclick="moveItem('${x.id}',-1)" ${index===0?"disabled":""}>上移</button>
       <button onclick="moveItem('${x.id}',1)" ${index===total-1?"disabled":""}>下移</button>
       <button onclick="toggleDone('${x.id}')">完成</button>
@@ -296,6 +308,7 @@ function bindCards(){
   });
 }
 function findBaseItem(id){for(const d of trip.days){for(const i of baseItemsForDay(d,edits.selectedDay6Plan||0)){if(i.id===id)return i}}return edits.addedItems.find(x=>x.id===id)}
+window.toggleRouteFixed=id=>{edits.routeFixed=edits.routeFixed||{};edits.routeFixed[id]=!edits.routeFixed[id];queueCloudSave()};
 window.moveItem=(id,delta)=>{
   const d=trip.days.find(x=>x.day===activeDay),plan=edits.selectedDay6Plan||0,items=itemsForDay(d,plan);
   const i=items.findIndex(x=>x.id===id),j=i+delta;if(i<0||j<0||j>=items.length)return;
@@ -338,7 +351,7 @@ function renderToday(){
   const dayNo=dayFromToday();if(!dayNo){$("#todayWeather").innerHTML="";$("#todayItems").innerHTML='<div class="today-empty">旅程尚未開始。出發後會自動顯示當天行程與天氣。</div>';return}
   const d=trip.days.find(x=>x.day===dayNo),items=itemsForDay(d);$("#todayWeather").innerHTML=weatherHtml(d);$("#todayItems").innerHTML=items.map((x,i)=>placeCard(x,items[i+1],i,items.length)).join("");bindCards()
 }
-function renderAll(){renderNav();renderDashboard();renderHotel();renderTabs();renderDay(activeDay);renderMap();renderToday();renderTools();renderCloudPanels();applyReadonly()}
+function renderAll(){renderNav();renderDashboard();renderHotel();renderTabs();renderDay(activeDay);renderMap();renderToday();renderTools();if(window.renderTodayReminder)window.renderTodayReminder();renderCloudPanels();applyReadonly()}
 function renderCloudPanels(){
   if(tripId){$("#noTripPanel").classList.add("hidden");$("#tripManagePanel").classList.remove("hidden");$("#syncBar").classList.remove("hidden")}else{$("#noTripPanel").classList.remove("hidden");$("#tripManagePanel").classList.add("hidden");$("#syncBar").classList.add("hidden")}
 }
@@ -386,7 +399,7 @@ function addShopping(){openEditor("新增必買／代購",[
 ],v=>{edits.shopping.unshift({...v,id:"shop-"+crypto.randomUUID(),qty:Number(v.qty)||0,unitPrice:Number(v.unitPrice)||0,done:false,image:""});queueCloudSave()})}
 window.shoppingPhoto=id=>pickImage(async file=>{try{setSync("上傳商品照片中…");const url=await uploadImage(file,"shopping");edits.shopping.find(v=>v.id===id).image=url;queueCloudSave()}catch(e){alert("上傳失敗："+e.message)}})
 
-async function loadAllWeather(){await Promise.all(trip.days.map(loadWeatherForDay));renderForecast();renderDay(activeDay);renderToday()}
+async function loadAllWeather(){await Promise.all(trip.days.map(loadWeatherForDay));renderForecast();renderDay(activeDay);renderToday();if(window.renderTodayReminder)window.renderTodayReminder()}
 async function loadWeatherForDay(day){
   const c=cityCoords[day.weather.location];
   try{const url=`https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&start_date=${day.date}&end_date=${day.date}`;const r=await fetch(url,{cache:"no-store"});if(!r.ok)throw new Error();const j=await r.json();if(!j.daily?.time?.length){weatherCache[day.date]={wait:true};return}const code=j.daily.weather_code[0],[icon,label]=weatherCodes[code]||["🌡️","天氣資訊"];weatherCache[day.date]={icon,label,max:j.daily.temperature_2m_max[0],min:j.daily.temperature_2m_min[0],rain:j.daily.precipitation_probability_max[0]??0}}catch{weatherCache[day.date]={wait:true}}
