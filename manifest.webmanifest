@@ -1,8 +1,8 @@
 {
-  "name": "Travel Companion｜Osaka 2026",
-  "short_name": "Travel Companion",
+  "name": "OSAKA 2026｜Janice's Journey",
+  "short_name": "Osaka 2026",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f5f1eb",
-  "theme_color": "#f5f1eb"
+  "background_color": "#f4efe9",
+  "theme_color": "#f4efe9"
 }

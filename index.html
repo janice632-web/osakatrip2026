@@ -3,43 +3,33 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#f5f1eb">
-  <title>Travel Companion｜Osaka 2026</title>
+  <meta name="theme-color" content="#f4efe9">
+  <title>OSAKA 2026｜Janice's Journey</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./assets/app.css">
 </head>
 <body>
-  <div id="loading" class="loading-screen">正在開啟旅程…</div>
+  <div id="boot" class="boot">正在讀取 Osaka 2026…</div>
 
-  <section id="welcome" class="welcome hidden">
-    <div class="welcome-card">
-      <div class="eyebrow">TRAVEL COMPANION V2</div>
-      <h1>Osaka 2026</h1>
-      <p>建立私人旅程連結後，可在 iPhone、iPad 與電腦同步使用。</p>
-      <button id="createTripBtn" class="primary-btn">建立私人旅程</button>
-      <div class="join-block">
-        <label>已有私人連結</label>
-        <input id="joinUrl" placeholder="貼上完整私人編輯網址">
-        <button id="joinTripBtn" class="secondary-btn">開啟旅程</button>
-      </div>
-      <p class="security-note">私人編輯網址等同密碼，請勿公開分享。</p>
-    </div>
-  </section>
-
-  <div id="app" class="app hidden">
+  <div id="app" class="hidden">
     <header class="hero">
-      <div class="hero-overlay"></div>
-      <div class="hero-content">
-        <div class="eyebrow">OSAKA 2026</div>
-        <h1>Janice’s Journey</h1>
-        <p>2026.08.12—08.17｜6天5夜</p>
-        <div class="flight-grid">
-          <div><b>BR176</b><span>14:20 桃園 T2 → 18:00 神戶 T2</span></div>
-          <div><b>BR175</b><span>19:00 神戶 T2 → 20:55 桃園 T2</span></div>
-        </div>
-        <div class="sync-row">
-          <span id="syncState">尚未同步</span>
-          <button id="syncNowBtn">立即同步</button>
+      <div class="hero-shade"></div>
+      <div class="hero-inner">
+        <div class="eyebrow">TRAVEL COMPANION V2.0.0</div>
+        <h1>OSAKA 2026<br><span>Janice’s Journey</span></h1>
+        <p id="tripDates">2026.08.12—08.17｜6天5夜</p>
+
+        <div class="hero-grid">
+          <div class="hero-chip">
+            <small>去程</small>
+            <b>BR176</b>
+            <span>14:20 桃園 T2 → 18:00 神戶 T2</span>
+          </div>
+          <div class="hero-chip">
+            <small>回程</small>
+            <b>BR175</b>
+            <span>19:00 神戶 T2 → 20:55 桃園 T2</span>
+          </div>
         </div>
       </div>
     </header>
@@ -47,104 +37,70 @@
     <main>
       <section id="homePage" class="page active">
         <div class="dashboard-grid">
-          <article class="dash-card">
+          <article class="metric-card">
             <small>COUNTDOWN</small>
             <strong id="countdown">—</strong>
             <span>距離出發</span>
           </article>
-          <article class="dash-card">
-            <small>WEATHER</small>
-            <strong id="weatherTemp">—</strong>
-            <span id="weatherText">大阪目前天氣</span>
-          </article>
-          <article class="dash-card wide">
+          <article class="metric-card">
             <small>TODAY</small>
-            <strong id="todayTitle">旅程尚未開始</strong>
-            <span id="todaySub">出發前可先整理行程與必買清單</span>
+            <strong id="todayLabel">行前準備</strong>
+            <span id="todaySummary">整理票券與必買清單</span>
           </article>
         </div>
 
         <section class="panel">
-          <div class="panel-head">
-            <div><small>QUICK LINKS</small><h2>快速入口</h2></div>
+          <div class="section-head">
+            <div><small>6-DAY FORECAST</small><h2>六天天氣</h2></div>
+            <button id="refreshWeather" class="text-btn">更新</button>
+          </div>
+          <div id="forecastStrip" class="forecast-strip"></div>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <div><small>HOTEL</small><h2>住宿資訊</h2></div>
+          </div>
+          <article id="hotelCard" class="hotel-card"></article>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <div><small>QUICK ACCESS</small><h2>快速入口</h2></div>
           </div>
           <div class="quick-grid">
-            <button data-go="itineraryPage">查看行程</button>
-            <button data-go="shoppingPage">必買清單</button>
-            <button data-go="expensePage">旅行花費</button>
-            <button id="shareBtn">分享旅程</button>
+            <button data-page-target="itineraryPage">查看每日行程</button>
+            <button data-page-target="todayPage">今日快速模式</button>
+            <a target="_blank" href="https://www.google.com/maps/search/?api=1&query=Sotetsu+Fresa+Inn+Osaka+Shinsaibashi">飯店導航</a>
+            <button id="exportData">匯出旅程 JSON</button>
           </div>
         </section>
+      </section>
+
+      <section id="todayPage" class="page">
+        <div class="page-head">
+          <div><small>TODAY MODE</small><h2>今日快速模式</h2></div>
+        </div>
+        <div id="todayWeather"></div>
+        <div id="todayItems"></div>
       </section>
 
       <section id="itineraryPage" class="page">
-        <div class="page-title">
+        <div class="page-head">
           <div><small>ITINERARY</small><h2>每日行程</h2></div>
-          <button id="addItineraryBtn" class="small-btn">新增行程</button>
         </div>
-        <div id="daysNav" class="days-nav"></div>
-        <div id="itineraryList"></div>
-      </section>
-
-      <section id="shoppingPage" class="page">
-        <div class="page-title">
-          <div><small>SHOPPING</small><h2>必買清單</h2></div>
-          <button id="addShoppingBtn" class="small-btn">新增商品</button>
-        </div>
-        <div id="shoppingStats" class="stats-grid"></div>
-        <div id="recipientSummary" class="panel compact"></div>
-        <div id="shoppingList" class="card-list"></div>
-      </section>
-
-      <section id="expensePage" class="page">
-        <div class="page-title">
-          <div><small>EXPENSES</small><h2>旅行花費</h2></div>
-          <button id="addExpenseBtn" class="small-btn">新增花費</button>
-        </div>
-        <div id="expenseStats" class="stats-grid"></div>
-        <div id="expenseList" class="card-list"></div>
-      </section>
-
-      <section id="morePage" class="page">
-        <div class="page-title"><div><small>MORE</small><h2>旅程設定</h2></div></div>
-        <section class="panel settings-list">
-          <button id="copyEditLink">複製私人編輯網址</button>
-          <button id="copyShareLink">複製唯讀分享網址</button>
-          <button id="exportJson">匯出 JSON 備份</button>
-          <label class="file-button">匯入 JSON 備份<input id="importJson" type="file" accept=".json,application/json" hidden></label>
-          <button id="resetLocal" class="danger-text">清除本機資料</button>
-        </section>
-        <p class="privacy">請勿在公開分享頁放入護照、信用卡或含完整 QR Code 的票券圖片。</p>
+        <div id="dayTabs" class="day-tabs"></div>
+        <div id="dayContent"></div>
       </section>
     </main>
 
     <nav class="bottom-nav">
-      <button class="active" data-page="homePage"><span>⌂</span>首頁</button>
+      <button data-page="homePage" class="active"><span>⌂</span>首頁</button>
+      <button data-page="todayPage"><span>◎</span>今日</button>
       <button data-page="itineraryPage"><span>▣</span>行程</button>
-      <button data-page="shoppingPage"><span>▤</span>必買</button>
-      <button data-page="expensePage"><span>¥</span>花費</button>
-      <button data-page="morePage"><span>•••</span>更多</button>
     </nav>
   </div>
 
-  <dialog id="editorDialog">
-    <form method="dialog" id="editorForm">
-      <div class="dialog-head"><h3 id="dialogTitle">新增</h3><button value="cancel">×</button></div>
-      <div id="editorFields"></div>
-      <menu>
-        <button value="cancel" class="secondary-btn">取消</button>
-        <button id="saveEditor" value="default" class="primary-btn">儲存</button>
-      </menu>
-    </form>
-  </dialog>
-
-  <dialog id="shareDialog">
-    <div class="dialog-head"><h3>分享旅程</h3><button onclick="shareDialog.close()">×</button></div>
-    <p>唯讀連結可分享給家人或朋友查看行程。</p>
-    <input id="shareUrlDisplay" readonly>
-    <button id="copyShareFromDialog" class="primary-btn">複製唯讀連結</button>
-  </dialog>
-
-  <script type="module" src="./assets/app.v3.js"></script>
+  <script type="module" src="./assets/app.m2.js"></script>
 </body>
 </html>
