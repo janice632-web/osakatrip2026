@@ -151,7 +151,7 @@ function itemsForDay(day,planIndex=edits.selectedDay6Plan||0){
 function travelReminder(max,rain){const a=[];if(max>=32)a.push("高溫，建議攜帶水與手持風扇");if(rain>=50)a.push("建議攜帶輕便雨具");return a.length?a.join("；"):"注意防曬並適時補充水分"}
 function weatherHtml(day){
   const w=weatherCache[day.date];
-  if(!w||w.wait)return `<div class="day-weather ${w.rain>=50?"rain-alert":""}"><div class="weather-wait">預報尚未開放，接近出發日期後自動更新。</div></div>`;
+  if(!w||w.wait)return `<div class="day-weather"><div class="weather-wait">預報尚未開放，接近出發日期後自動更新。</div></div>`;
   return `<div class="day-weather ${w.rain>=50?"rain-alert":""}"><div class="weather-main"><div><b>${w.icon} ${esc(w.label)}</b><div style="font-size:12px;color:var(--muted)">${travelReminder(w.max,w.rain)}</div></div><strong>${Math.round(w.min)}–${Math.round(w.max)}°C</strong></div><div class="weather-meta"><div><b>最高</b><span>${Math.round(w.max)}°C</span></div><div><b>最低</b><span>${Math.round(w.min)}°C</span></div><div><b>降雨</b><span>${w.rain}%</span></div></div></div>`;
 }
 
@@ -453,7 +453,7 @@ $("#copyReadLink").onclick=()=>copyText(readLink());
 $("#syncNow").onclick=saveCloud;
 $("#exportState").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(edits,null,2)],{type:"application/json"}));a.download="osaka-2026-edits.json";a.click();URL.revokeObjectURL(a.href)};
 $("#importState").onchange=e=>{const r=new FileReader();r.onload=()=>{try{edits={...edits,...JSON.parse(r.result)};queueCloudSave()}catch{alert("檔案格式錯誤")}};r.readAsText(e.target.files[0])};
-$("#clearEdits").onclick=()=>{if(confirm("清除所有個人修改？原始行程仍會保留。")){const share=edits.shareToken;edits={version:1,itemOverrides:{},hiddenItems:[],addedItems:[],hotelImage:"",selectedDay6Plan:0,lastModified:null,shareToken:share};queueCloudSave()}};
+$("#clearEdits").onclick=()=>{if(confirm("清除所有個人修改？原始行程仍會保留。")){const share=edits.shareToken;edits={version:3,itemOverrides:{},hiddenItems:[],addedItems:[],hotelImage:"",hotelBooking:{},selectedDay6Plan:0,dayOrders:{},favorites:[],shopping:[],luggage:{outbound:[],return:[]},diary:[],currencyRate:0.205,lastModified:null,shareToken:share};queueCloudSave()}};
 
 $("#addShopping").onclick=addShoppingItem;
 $("#addLuggage").onclick=addLuggageItem;

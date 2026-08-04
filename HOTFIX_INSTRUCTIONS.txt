@@ -1,0 +1,7 @@
+覆蓋以下 3 個檔案：
+1. assets/app.js
+2. index.html
+3. service-worker.js
+
+Commit: V3.1.1 initialization hotfix
+Push 後等待 GitHub Pages 部署，再以 Ctrl+Shift+R 強制重新整理。
