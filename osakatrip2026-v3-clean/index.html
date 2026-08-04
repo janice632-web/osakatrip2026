@@ -6,6 +6,8 @@
   <meta name="theme-color" content="#f4efe9">
   <title>OSAKA 2026｜Janice's Journey</title>
   <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
   <link rel="stylesheet" href="./assets/app.css">
 </head>
 <body>
@@ -15,7 +17,7 @@
     <header class="hero">
       <div class="hero-shade"></div>
       <div class="hero-inner">
-        <div class="eyebrow">TRAVEL COMPANION V2.1.0 DEV</div>
+        <div class="eyebrow">TRAVEL COMPANION V3.0.0</div>
         <h1>OSAKA 2026<br><span>Janice’s Journey</span></h1>
         <p id="tripDates">2026.08.12—08.17｜6天5夜</p>
 
@@ -105,34 +107,6 @@
         <div id="mapList"></div>
       </section>
 
-
-      <section id="toolsPage" class="page">
-        <div class="page-head"><div><small>TRAVEL TOOLS</small><h2>旅行工具</h2></div></div>
-        <div class="tool-tabs">
-          <button data-tool="shoppingTool" class="active">必買</button>
-          <button data-tool="expenseTool">花費</button>
-          <button data-tool="luggageTool">行李</button>
-          <button data-tool="ticketTool">票券</button>
-        </div>
-        <section id="shoppingTool" class="tool-panel active">
-          <div class="section-head"><div><small>SHOPPING</small><h3>必買清單</h3></div><button id="addShopping" class="small-action">新增</button></div>
-          <div id="shoppingStats" class="mini-stats"></div><div id="shoppingList"></div>
-        </section>
-        <section id="expenseTool" class="tool-panel">
-          <div class="section-head"><div><small>EXPENSES</small><h3>花費記帳</h3></div><button id="addExpense" class="small-action">新增</button></div>
-          <div id="expenseStats" class="mini-stats"></div><div id="expenseList"></div>
-        </section>
-        <section id="luggageTool" class="tool-panel">
-          <div class="section-head"><div><small>LUGGAGE</small><h3>行李清單</h3></div><button id="addLuggage" class="small-action">新增</button></div>
-          <div id="luggageLists"></div>
-        </section>
-        <section id="ticketTool" class="tool-panel">
-          <div class="section-head"><div><small>TICKETS</small><h3>票券中心</h3></div><button id="addTicket" class="small-action">新增</button></div>
-          <p class="privacy-note">含 QR Code 或個資的票券，不建議放入公開 Bucket。</p>
-          <div id="ticketList"></div>
-        </section>
-      </section>
-
       <section id="morePage" class="page">
         <div class="page-head">
           <div><small>CLOUD & SHARE</small><h2>同步與分享</h2></div>
@@ -181,6 +155,6 @@
     </form>
   </dialog>
 
-  <script defer src="./assets/app.v210.dev.js?v=210dev1"></script>
+  <script defer src="./assets/app.js?v=300"></script>
 </body>
 </html>
