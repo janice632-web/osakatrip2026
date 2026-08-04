@@ -1,0 +1,21 @@
+V3.2 資料保留更新
+
+只覆蓋以下 4 個檔案：
+- assets/app.js
+- assets/app.css
+- index.html
+- service-worker.js
+
+不要刪除或覆蓋：
+- public/data/
+- icons/
+- SUPABASE_SETUP.sql
+
+資料保護：
+- 原有 Supabase payload 不清空
+- 原有 localStorage 修改會先建立時間戳備份
+- 新欄位只在缺少時補入
+- 行程、住宿、照片、排序與自訂資料會保留
+
+Commit:
+V3.2 preserve-data update

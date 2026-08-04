@@ -17,7 +17,7 @@
     <header class="hero">
       <div class="hero-shade"></div>
       <div class="hero-inner">
-        <div class="eyebrow">TRAVEL COMPANION V3.1.1</div>
+        <div class="eyebrow">TRAVEL COMPANION V3.2.0</div>
         <h1>OSAKA 2026<br><span>Janice’s Journey</span></h1>
         <p id="tripDates">2026.08.12—08.17｜6天5夜</p>
 
@@ -114,53 +114,45 @@
         </div>
 
         <div class="tool-tabs">
-          <button data-tool="favoriteTool" class="active">收藏</button>
-          <button data-tool="shoppingTool">必買</button>
-          <button data-tool="luggageTool">行李</button>
-          <button data-tool="diaryTool">日記</button>
-          <button data-tool="assistantTool">AI 助手</button>
+          <button data-tool="prepTool" class="active">行前準備</button>
+          <button data-tool="shoppingTool">必買／代購</button>
+          <button data-tool="emergencyTool">海外救助</button>
         </div>
 
-        <section id="favoriteTool" class="tool-panel active">
-          <div class="section-head"><div><small>FAVORITES</small><h3>收藏景點</h3></div></div>
-          <div id="favoriteList"></div>
+        <section id="prepTool" class="tool-panel active">
+          <div class="section-head">
+            <div><small>PRE-TRIP</small><h3>行前準備文件</h3></div>
+            <button id="addPrepItem" class="small-action">新增</button>
+          </div>
+          <div id="prepProgress" class="progress-card"></div>
+          <div id="prepList"></div>
         </section>
 
         <section id="shoppingTool" class="tool-panel">
-          <div class="section-head"><div><small>SHOPPING</small><h3>必買清單</h3></div><button id="addShopping" class="small-action">新增</button></div>
+          <div class="section-head">
+            <div><small>SHOPPING</small><h3>必買／代購清單</h3></div>
+            <button id="addShopping" class="small-action">新增</button>
+          </div>
           <div id="shoppingStats" class="mini-stats"></div>
+          <div id="personSummary"></div>
           <div id="shoppingList"></div>
         </section>
 
-        <section id="luggageTool" class="tool-panel">
-          <div class="section-head"><div><small>LUGGAGE</small><h3>行李清單</h3></div><button id="addLuggage" class="small-action">新增</button></div>
-          <div id="luggageLists"></div>
-        </section>
-
-        <section id="diaryTool" class="tool-panel">
-          <div class="section-head"><div><small>TRAVEL DIARY</small><h3>旅遊日記</h3></div><button id="addDiary" class="small-action">新增</button></div>
-          <div id="diaryList"></div>
-        </section>
-
-        <section id="assistantTool" class="tool-panel">
-          <div class="section-head"><div><small>AI ASSISTANT</small><h3>AI 行程助手</h3></div></div>
-          <p class="privacy-note">此功能不會傳送私人資料；只會依你選擇的日期產生文字提示。</p>
-          <div class="assistant-box">
-            <label>選擇日期</label>
-            <select id="assistantDay"></select>
-            <label>想詢問的內容</label>
-            <textarea id="assistantQuestion" placeholder="例如：下雨時如何調整行程？"></textarea>
-            <button id="copyAssistantPrompt" class="primary-action">複製提示並開啟 ChatGPT</button>
+        <section id="emergencyTool" class="tool-panel">
+          <div class="section-head"><div><small>EMERGENCY</small><h3>海外救助</h3></div></div>
+          <div class="emergency-grid">
+            <a class="emergency-call" href="tel:110"><b>日本警察</b><strong>110</strong></a>
+            <a class="emergency-call" href="tel:119"><b>救護／消防</b><strong>119</strong></a>
           </div>
-        </section>
-
-        <section class="panel converter-panel">
-          <div class="section-head"><div><small>CURRENCY</small><h3>日圓換算</h3></div></div>
-          <div class="converter-grid">
-            <label>日圓<input id="yenInput" inputmode="decimal" value="1000"></label>
-            <label>參考匯率<input id="rateInput" inputmode="decimal" value="0.205"></label>
-            <div><small>台幣參考</small><strong id="twdOutput">NT$205</strong></div>
-          </div>
+          <article class="emergency-card">
+            <h4>台北駐大阪經濟文化辦事處</h4>
+            <p>電話、地址與辦公時間請於出發前依官方最新資料確認。</p>
+            <a target="_blank" href="https://www.google.com/maps/search/?api=1&query=Taipei+Economic+and+Cultural+Office+in+Osaka">Google Maps</a>
+          </article>
+          <details class="guide-card"><summary>護照遺失</summary><p>先向當地警察報案取得證明，再聯絡駐外辦事處申請旅行文件，並通知航空公司。</p></details>
+          <details class="guide-card"><summary>信用卡遺失</summary><p>立即聯絡發卡銀行停卡，確認最近交易，保留報案或停卡紀錄。</p></details>
+          <details class="guide-card"><summary>手機遺失</summary><p>先使用尋找裝置功能鎖定或清除資料，再停用 SIM／eSIM，必要時報警。</p></details>
+          <details class="guide-card"><summary>行李遺失</summary><p>機場內向航空公司行李服務櫃檯申報；市區遺失則聯絡車站、飯店或警察署。</p></details>
         </section>
       </section>
 
@@ -212,6 +204,6 @@
     </form>
   </dialog>
 
-  <script defer src="./assets/app.js?v=311hotfix1"></script>
+  <script defer src="./assets/app.js?v=320-preserve1"></script>
 </body>
 </html>
