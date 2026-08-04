@@ -17,7 +17,7 @@
     <header class="hero">
       <div class="hero-shade"></div>
       <div class="hero-inner">
-        <div class="eyebrow">TRAVEL COMPANION V3.0.0</div>
+        <div class="eyebrow">TRAVEL COMPANION V3.1.0</div>
         <h1>OSAKA 2026<br><span>Janice’s Journey</span></h1>
         <p id="tripDates">2026.08.12—08.17｜6天5夜</p>
 
@@ -107,6 +107,63 @@
         <div id="mapList"></div>
       </section>
 
+
+      <section id="toolsPage" class="page">
+        <div class="page-head">
+          <div><small>TRAVEL TOOLS</small><h2>旅行工具</h2></div>
+        </div>
+
+        <div class="tool-tabs">
+          <button data-tool="favoriteTool" class="active">收藏</button>
+          <button data-tool="shoppingTool">必買</button>
+          <button data-tool="luggageTool">行李</button>
+          <button data-tool="diaryTool">日記</button>
+          <button data-tool="assistantTool">AI 助手</button>
+        </div>
+
+        <section id="favoriteTool" class="tool-panel active">
+          <div class="section-head"><div><small>FAVORITES</small><h3>收藏景點</h3></div></div>
+          <div id="favoriteList"></div>
+        </section>
+
+        <section id="shoppingTool" class="tool-panel">
+          <div class="section-head"><div><small>SHOPPING</small><h3>必買清單</h3></div><button id="addShopping" class="small-action">新增</button></div>
+          <div id="shoppingStats" class="mini-stats"></div>
+          <div id="shoppingList"></div>
+        </section>
+
+        <section id="luggageTool" class="tool-panel">
+          <div class="section-head"><div><small>LUGGAGE</small><h3>行李清單</h3></div><button id="addLuggage" class="small-action">新增</button></div>
+          <div id="luggageLists"></div>
+        </section>
+
+        <section id="diaryTool" class="tool-panel">
+          <div class="section-head"><div><small>TRAVEL DIARY</small><h3>旅遊日記</h3></div><button id="addDiary" class="small-action">新增</button></div>
+          <div id="diaryList"></div>
+        </section>
+
+        <section id="assistantTool" class="tool-panel">
+          <div class="section-head"><div><small>AI ASSISTANT</small><h3>AI 行程助手</h3></div></div>
+          <p class="privacy-note">此功能不會傳送私人資料；只會依你選擇的日期產生文字提示。</p>
+          <div class="assistant-box">
+            <label>選擇日期</label>
+            <select id="assistantDay"></select>
+            <label>想詢問的內容</label>
+            <textarea id="assistantQuestion" placeholder="例如：下雨時如何調整行程？"></textarea>
+            <button id="copyAssistantPrompt" class="primary-action">複製提示並開啟 ChatGPT</button>
+          </div>
+        </section>
+
+        <section class="panel converter-panel">
+          <div class="section-head"><div><small>CURRENCY</small><h3>日圓換算</h3></div></div>
+          <div class="converter-grid">
+            <label>日圓<input id="yenInput" inputmode="decimal" value="1000"></label>
+            <label>參考匯率<input id="rateInput" inputmode="decimal" value="0.205"></label>
+            <div><small>台幣參考</small><strong id="twdOutput">NT$205</strong></div>
+          </div>
+        </section>
+      </section>
+
       <section id="morePage" class="page">
         <div class="page-head">
           <div><small>CLOUD & SHARE</small><h2>同步與分享</h2></div>
@@ -155,6 +212,6 @@
     </form>
   </dialog>
 
-  <script defer src="./assets/app.js?v=300"></script>
+  <script defer src="./assets/app.js?v=310"></script>
 </body>
 </html>

@@ -32,8 +32,23 @@ const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const params=new URLSearchParams(location.search);
 let tripId=params.get("trip"), editToken=params.get("key"), readToken=params.get("view");
 let readonly=!!readToken&&!editToken;
-let trip,hotel,activeDay=1,weatherCache={},cloudTimer=null,lastCloudUpdated=null;
-let edits={version:1,itemOverrides:{},hiddenItems:[],addedItems:[],hotelImage:"",selectedDay6Plan:0,lastModified:null};
+let trip,hotel,defaultShopping,defaultLuggage,activeDay=1,weatherCache={},cloudTimer=null,lastCloudUpdated=null;
+let edits={
+  version:3,
+  itemOverrides:{},
+  hiddenItems:[],
+  addedItems:[],
+  hotelImage:"",
+  hotelBooking:{},
+  selectedDay6Plan:0,
+  dayOrders:{},
+  favorites:[],
+  shopping:[],
+  luggage:{outbound:[],return:[]},
+  diary:[],
+  currencyRate:0.205,
+  lastModified:null
+};
 
 const headers={"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"};
 const cityCoords={Osaka:{lat:34.6937,lon:135.5023,label:"大阪"},Kyoto:{lat:35.0116,lon:135.7681,label:"京都"},Kobe:{lat:34.6901,lon:135.1955,label:"神戶"}};
@@ -41,6 +56,8 @@ const weatherCodes={0:["☀️","晴朗"],1:["🌤️","大致晴朗"],2:["⛅",
 
 function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 function mapUrl(q){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q||"")}
+function directionUrl(q,mode="transit"){return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(q||"")+"&travelmode="+encodeURIComponent(mode)}
+function nearbyFoodUrl(q){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent("restaurants near "+(q||""))}
 function dateKey(){return new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo"}).format(new Date())}
 function token(bytes=24){const a=new Uint8Array(bytes);crypto.getRandomValues(a);return [...a].map(v=>v.toString(16).padStart(2,"0")).join("")}
 function activeToken(){return editToken||readToken}
@@ -119,21 +136,28 @@ function baseItemsForDay(day,planIndex=edits.selectedDay6Plan||0){
   if(day.plans?.length)base.unshift(...day.plans[planIndex].items);
   return base;
 }
+function orderKey(day,planIndex=edits.selectedDay6Plan||0){return "day-"+day.day+"-plan-"+planIndex}
 function itemsForDay(day,planIndex=edits.selectedDay6Plan||0){
   const base=baseItemsForDay(day,planIndex).filter(x=>!isHidden(x.id)).map(mergedItem);
   const added=edits.addedItems.filter(x=>Number(x.day)===Number(day.day) && !isHidden(x.id)).map(mergedItem);
-  return [...base,...added].sort((a,b)=>String(a.time||"99:99").localeCompare(String(b.time||"99:99")));
+  const all=[...base,...added];
+  const custom=edits.dayOrders?.[orderKey(day,planIndex)]||[];
+  if(custom.length){
+    const rank=new Map(custom.map((id,i)=>[id,i]));
+    return all.sort((a,b)=>(rank.has(a.id)?rank.get(a.id):9999)-(rank.has(b.id)?rank.get(b.id):9999)||String(a.time||"99:99").localeCompare(String(b.time||"99:99")));
+  }
+  return all.sort((a,b)=>String(a.time||"99:99").localeCompare(String(b.time||"99:99")));
 }
 function travelReminder(max,rain){const a=[];if(max>=32)a.push("高溫，建議攜帶水與手持風扇");if(rain>=50)a.push("建議攜帶輕便雨具");return a.length?a.join("；"):"注意防曬並適時補充水分"}
 function weatherHtml(day){
   const w=weatherCache[day.date];
-  if(!w||w.wait)return `<div class="day-weather"><div class="weather-wait">預報尚未開放，接近出發日期後自動更新。</div></div>`;
-  return `<div class="day-weather"><div class="weather-main"><div><b>${w.icon} ${esc(w.label)}</b><div style="font-size:12px;color:var(--muted)">${travelReminder(w.max,w.rain)}</div></div><strong>${Math.round(w.min)}–${Math.round(w.max)}°C</strong></div><div class="weather-meta"><div><b>最高</b><span>${Math.round(w.max)}°C</span></div><div><b>最低</b><span>${Math.round(w.min)}°C</span></div><div><b>降雨</b><span>${w.rain}%</span></div></div></div>`;
+  if(!w||w.wait)return `<div class="day-weather ${w.rain>=50?"rain-alert":""}"><div class="weather-wait">預報尚未開放，接近出發日期後自動更新。</div></div>`;
+  return `<div class="day-weather ${w.rain>=50?"rain-alert":""}"><div class="weather-main"><div><b>${w.icon} ${esc(w.label)}</b><div style="font-size:12px;color:var(--muted)">${travelReminder(w.max,w.rain)}</div></div><strong>${Math.round(w.min)}–${Math.round(w.max)}°C</strong></div><div class="weather-meta"><div><b>最高</b><span>${Math.round(w.max)}°C</span></div><div><b>最低</b><span>${Math.round(w.min)}°C</span></div><div><b>降雨</b><span>${w.rain}%</span></div></div></div>`;
 }
 
 function renderNav(){
   const editNav=[
-    ["homePage","⌂","首頁"],["todayPage","◎","今日"],["itineraryPage","▣","行程"],["mapPage","⌖","地圖"],["morePage","•••","更多"]
+    ["homePage","⌂","首頁"],["todayPage","◎","今日"],["itineraryPage","▣","行程"],["mapPage","⌖","地圖"],["toolsPage","☰","工具"],["morePage","•••","更多"]
   ];
   const readNav=[["homePage","⌂","首頁"],["itineraryPage","▣","行程"],["mapPage","⌖","地圖"]];
   const nav=readonly?readNav:editNav;
@@ -151,9 +175,50 @@ function renderDashboard(){
   const today=dayFromToday();
   if(today){const d=trip.days.find(x=>x.day===today),first=itemsForDay(d)[0];$("#todayLabel").textContent=`Day ${today}`;$("#todaySummary").textContent=first?`${first.time}｜${first.title}`:d.title}
 }
-function renderHotel(){
-  $("#hotelCard").innerHTML=`<h3>${esc(hotel.name)}</h3><p>${esc(hotel.nameEn)}</p><p>Check-in：${esc(hotel.checkIn)}</p><p>8/12 晚間抵達，從心齋橋（長堀通）巴士下車點步行前往。</p>${edits.hotelImage?`<img class="user-image" src="${edits.hotelImage}" loading="lazy">`:""}<div class="hotel-actions"><a class="pill-link" target="_blank" href="${mapUrl(hotel.mapsQuery)}">Google Maps</a><button class="small-action" onclick="toggleHotelDetails()">展開住宿備註</button>${!readonly?'<button class="small-action" onclick="uploadHotelImage()">上傳入口照片</button>':""}</div><div id="hotelDetails" class="details"><div class="detail-note">${hotel.notes.map(esc).join("<br>")}</div></div>`;
+function currentHotel(){
+  return {...hotel,...(edits.hotelBooking||{})};
 }
+function renderHotel(){
+  const h=currentHotel();
+  const detailRows=[
+    ["訂房平台",h.bookingPlatform],
+    ["訂單編號",h.bookingNumber],
+    ["房型",h.roomType],
+    ["入住人",h.guestName],
+    ["入住日期",h.checkIn],
+    ["退房日期",h.checkOut],
+    ["電話",h.phone],
+    ["地址",h.address]
+  ].filter(x=>x[1]);
+  $("#hotelCard").innerHTML=`<h3>${esc(h.name||hotel.name)}</h3>
+    <p>${esc(h.nameEn||hotel.nameEn||"")}</p>
+    <p>${h.checkIn?`入住：${esc(h.checkIn)}`:"尚未輸入入住日期"}${h.checkOut?`｜退房：${esc(h.checkOut)}`:""}</p>
+    ${h.bookingPlatform||h.bookingNumber?`<p>${esc(h.bookingPlatform||"")} ${h.bookingNumber?`｜訂單 ${esc(h.bookingNumber)}`:""}</p>`:""}
+    ${edits.hotelImage?`<img class="user-image" src="${edits.hotelImage}" loading="lazy">`:""}
+    <div class="hotel-actions">
+      <a class="pill-link" target="_blank" href="${mapUrl(h.mapsQuery||h.address||h.name)}">Google Maps</a>
+      <button class="small-action" onclick="toggleHotelDetails()">展開訂房資料</button>
+      ${!readonly?'<button class="small-action" onclick="editHotelBooking()">編輯訂房資料</button><button class="small-action" onclick="uploadHotelImage()">上傳入口照片</button>':""}
+    </div>
+    <div id="hotelDetails" class="details">
+      <div class="detail-grid">
+        ${detailRows.length?detailRows.map(([k,v])=>`<div class="detail-row"><b>${esc(k)}</b><span>${esc(v)}</span></div>`).join(""):'<div class="detail-note">尚未輸入訂房資料。</div>'}
+      </div>
+      ${h.bookingNotes?`<div class="detail-note">${esc(h.bookingNotes)}</div>`:""}
+    </div>`;
+}
+window.editHotelBooking=()=>{const h=currentHotel();openEditor("編輯訂房資料",[
+  {name:"name",label:"飯店名稱",type:"text",value:h.name||""},
+  {name:"bookingPlatform",label:"訂房平台",type:"text",value:h.bookingPlatform||""},
+  {name:"bookingNumber",label:"訂單編號",type:"text",value:h.bookingNumber||""},
+  {name:"roomType",label:"房型",type:"text",value:h.roomType||""},
+  {name:"guestName",label:"入住人",type:"text",value:h.guestName||""},
+  {name:"checkIn",label:"入住日期／時間",type:"text",value:h.checkIn||""},
+  {name:"checkOut",label:"退房日期／時間",type:"text",value:h.checkOut||""},
+  {name:"phone",label:"飯店電話",type:"text",value:h.phone||""},
+  {name:"address",label:"地址",type:"text",value:h.address||""},
+  {name:"bookingNotes",label:"訂房備註",type:"textarea",value:h.bookingNotes||""}
+],v=>{edits.hotelBooking={...(edits.hotelBooking||{}),...v,mapsQuery:v.address||h.mapsQuery};queueCloudSave()})}
 window.toggleHotelDetails=()=>$("#hotelDetails").style.display=$("#hotelDetails").style.display==="block"?"none":"block";
 window.uploadHotelImage=()=>pickImage(async file=>{try{setSync("上傳圖片中…");edits.hotelImage=await uploadImage(file,"hotel");queueCloudSave()}catch(e){alert("上傳失敗："+e.message)}});
 
@@ -166,18 +231,77 @@ function renderDay(dayNo,planIndex=edits.selectedDay6Plan||0){
   if(d.plans?.length)edits.selectedDay6Plan=planIndex;
   let planSwitch=d.plans?.length?`<div class="plan-switch">${d.plans.map((p,i)=>`<button data-plan="${i}" class="${i===planIndex?"active":""}">${esc(p.name)}</button>`).join("")}</div>`:"";
   const items=itemsForDay(d,planIndex);
-  $("#dayContent").innerHTML=`<div class="day-header"><small>DAY ${d.day} · ${d.date.replaceAll("-","/")}</small><h3>${esc(d.title)}</h3><p>${esc(d.city)}</p></div>${weatherHtml(d)}${planSwitch}<div>${items.map((x,i)=>placeCard(x,items[i+1])).join("")}</div>${!readonly?`<button class="primary-action" onclick="addItem(${dayNo})">新增 Day ${dayNo} 行程</button>`:""}`;
-  bindCards();
+  $("#dayContent").innerHTML=`<div class="day-header"><small>DAY ${d.day} · ${d.date.replaceAll("-","/")}</small><h3>${esc(d.title)}</h3><p>${esc(d.city)}</p>${!readonly?'<p class="sort-hint">按住 ↕ 拖曳，或使用上移／下移調整順序。</p>':""}</div>${weatherHtml(d)}${planSwitch}<div id="sortableCards" data-day="${d.day}" data-plan="${planIndex}">${items.map((x,i)=>placeCard(x,items[i+1],i,items.length)).join("")}</div>${!readonly?`<button class="primary-action" onclick="addItem(${dayNo})">新增 Day ${dayNo} 行程</button>`:""}`;
+  bindCards(d,planIndex);
   $$(".plan-switch button").forEach(b=>b.onclick=()=>{edits.selectedDay6Plan=Number(b.dataset.plan);persistLocal();renderDay(dayNo,Number(b.dataset.plan))});
 }
-function placeCard(x,next){
+function placeCard(x,next,index,total){
   const rows=[],t=x.transport||{},det=x.details||{};
   if(t.boarding)rows.push(["上車／起點",t.boarding]);if(t.transfer)rows.push(["轉乘",t.transfer]);if(t.route)rows.push(["路線",t.route]);if(t.arrival)rows.push(["下車／終點",t.arrival]);if(t.exit)rows.push(["出口",t.exit]);if(t.walkingMinutes)rows.push(["步行",`${t.walkingMinutes} 分鐘`]);
   if(det.boardingPoint)rows.push(["遊園車上車點",det.boardingPoint]);if(det.backupPoint)rows.push(["替代上車點",det.backupPoint]);if(det.dropOffPoint)rows.push(["遊園車下車點",det.dropOffPoint]);if(det.price)rows.push(["費用",det.price]);if(det.operationHours)rows.push(["營運時間",det.operationHours]);if(det.recommendedStayMinutes)rows.push(["建議停留",`${det.recommendedStayMinutes} 分鐘`]);if(det.cafes)rows.push(["咖啡備選",det.cafes.join("、")]);if(det.routeOptions)rows.push(["集合交通",det.routeOptions.join("／")]);if(det.flight)rows.push(["航班",`${det.flight}｜${det.departure} → ${det.arrival}`]);
-  return `<article class="place-card ${x.done?"done":""}" data-id="${x.id}"><div class="place-top"><div class="place-time">${esc(x.time)}</div><div class="place-main"><h3>${esc(x.title)}</h3><div class="place-location">${esc(x.place)}</div><p class="place-summary">${esc(x.summary||"")}</p></div><button class="expand-btn">詳情</button></div><div class="card-actions"><a class="pill-link" target="_blank" href="${mapUrl(x.mapsQuery||x.place)}">Google Maps</a>${next?`<a class="pill-link" target="_blank" href="${mapUrl(next.mapsQuery||next.place)}">前往下一站</a>`:""}</div>${x.image?`<img class="user-image" src="${x.image}" loading="lazy">`:""}${!readonly?`<div class="edit-tools"><button onclick="toggleDone('${x.id}')">完成</button><button onclick="editItem('${x.id}')">編輯</button><button onclick="uploadItemImage('${x.id}')">圖片</button><button class="danger" onclick="hideItem('${x.id}')">隱藏</button></div>`:""}<div class="details"><div class="detail-grid">${rows.length?rows.map(([k,v])=>`<div class="detail-row"><b>${esc(k)}</b><span>${esc(v)}</span></div>`).join(""):'<div class="detail-note">目前沒有額外交通資料。</div>'}</div>${det.operationNote?`<div class="detail-note">${esc(det.operationNote)}</div>`:""}</div></article>`;
+  const favorite=(edits.favorites||[]).includes(x.id);
+  return `<article class="place-card ${x.done?"done":""}" data-id="${x.id}" draggable="${readonly?"false":"true"}">
+    <div class="place-top">
+      ${!readonly?'<button class="drag-handle" title="拖曳排序">↕</button>':""}
+      <div class="place-time">${esc(x.time)}</div>
+      <div class="place-main"><h3>${esc(x.title)}</h3><div class="place-location">${esc(x.place)}</div><p class="place-summary">${esc(x.summary||"")}</p></div>
+      <button class="expand-btn">詳情</button>
+    </div>
+    <div class="card-actions">
+      <a class="pill-link" target="_blank" href="${mapUrl(x.mapsQuery||x.place)}">Google Maps</a>
+      <a class="pill-link" target="_blank" href="${directionUrl(x.mapsQuery||x.place)}">目前位置導航</a>
+      <a class="pill-link" target="_blank" href="${nearbyFoodUrl(x.mapsQuery||x.place)}">附近美食</a>
+      <a class="pill-link" target="_blank" href="${directionUrl(x.mapsQuery||x.place,"transit")}">即時交通</a>
+      ${next?`<a class="pill-link" target="_blank" href="${directionUrl(next.mapsQuery||next.place)}">前往下一站</a>`:""}
+    </div>
+    ${x.image?`<img class="user-image" src="${x.image}" loading="lazy">`:""}
+    ${!readonly?`<div class="edit-tools">
+      <button onclick="toggleFavorite('${x.id}')">${favorite?"★ 已收藏":"☆ 收藏"}</button>
+      <button onclick="moveItem('${x.id}',-1)" ${index===0?"disabled":""}>上移</button>
+      <button onclick="moveItem('${x.id}',1)" ${index===total-1?"disabled":""}>下移</button>
+      <button onclick="toggleDone('${x.id}')">完成</button>
+      <button onclick="editItem('${x.id}')">編輯</button>
+      <button onclick="uploadItemImage('${x.id}')">圖片</button>
+      <button class="danger" onclick="hideItem('${x.id}')">隱藏</button>
+    </div>`:""}
+    <div class="details"><div class="detail-grid">${rows.length?rows.map(([k,v])=>`<div class="detail-row"><b>${esc(k)}</b><span>${esc(v)}</span></div>`).join(""):'<div class="detail-note">目前沒有額外交通資料。</div>'}</div>${det.operationNote?`<div class="detail-note">${esc(det.operationNote)}</div>`:""}</div>
+  </article>`;
 }
-function bindCards(){$$(".expand-btn").forEach(b=>b.onclick=()=>b.closest(".place-card").classList.toggle("open"))}
+function saveVisibleOrder(day,planIndex){
+  const ids=$$("#sortableCards .place-card").map(x=>x.dataset.id);
+  edits.dayOrders=edits.dayOrders||{};
+  edits.dayOrders["day-"+day+"-plan-"+planIndex]=ids;
+  queueCloudSave();
+}
+function bindCards(day,planIndex){
+  $$(".expand-btn").forEach(b=>b.onclick=()=>b.closest(".place-card").classList.toggle("open"));
+  if(readonly)return;
+  let dragging=null;
+  $$("#sortableCards .place-card").forEach(card=>{
+    card.addEventListener("dragstart",e=>{dragging=card;card.classList.add("dragging");e.dataTransfer.effectAllowed="move"});
+    card.addEventListener("dragend",()=>{card.classList.remove("dragging");dragging=null;saveVisibleOrder(day.day,planIndex)});
+    card.addEventListener("dragover",e=>{
+      e.preventDefault();
+      if(!dragging||dragging===card)return;
+      const rect=card.getBoundingClientRect();
+      const after=e.clientY>rect.top+rect.height/2;
+      card.parentNode.insertBefore(dragging,after?card.nextSibling:card);
+    });
+  });
+}
 function findBaseItem(id){for(const d of trip.days){for(const i of baseItemsForDay(d,edits.selectedDay6Plan||0)){if(i.id===id)return i}}return edits.addedItems.find(x=>x.id===id)}
+window.toggleFavorite=id=>{
+  edits.favorites=edits.favorites||[];
+  edits.favorites=edits.favorites.includes(id)?edits.favorites.filter(x=>x!==id):[...edits.favorites,id];
+  queueCloudSave();
+};
+window.moveItem=(id,delta)=>{
+  const d=trip.days.find(x=>x.day===activeDay),plan=edits.selectedDay6Plan||0;
+  const items=itemsForDay(d,plan),index=items.findIndex(x=>x.id===id),next=index+delta;
+  if(index<0||next<0||next>=items.length)return;
+  const ids=items.map(x=>x.id);[ids[index],ids[next]]=[ids[next],ids[index]];
+  edits.dayOrders=edits.dayOrders||{};edits.dayOrders[orderKey(d,plan)]=ids;queueCloudSave();
+};
 window.toggleDone=id=>{edits.itemOverrides[id]={...(edits.itemOverrides[id]||{}),done:!mergedItem(findBaseItem(id)).done};queueCloudSave()};
 window.hideItem=id=>{if(confirm("隱藏此行程？")){if(!edits.hiddenItems.includes(id))edits.hiddenItems.push(id);queueCloudSave()}};
 window.editItem=id=>{const x=mergedItem(findBaseItem(id));openEditor("編輯行程",[
@@ -212,9 +336,9 @@ function renderMap(){
 }
 function renderToday(){
   const dayNo=dayFromToday();if(!dayNo){$("#todayWeather").innerHTML="";$("#todayItems").innerHTML='<div class="today-empty">旅程尚未開始。出發後會自動顯示當天行程與天氣。</div>';return}
-  const d=trip.days.find(x=>x.day===dayNo),items=itemsForDay(d);$("#todayWeather").innerHTML=weatherHtml(d);$("#todayItems").innerHTML=items.map((x,i)=>placeCard(x,items[i+1])).join("");bindCards()
+  const d=trip.days.find(x=>x.day===dayNo),items=itemsForDay(d);$("#todayWeather").innerHTML=weatherHtml(d);$("#todayItems").innerHTML=items.map((x,i)=>placeCard(x,items[i+1],i,items.length)).join("");bindCards(d,edits.selectedDay6Plan||0)
 }
-function renderAll(){renderNav();renderDashboard();renderHotel();renderTabs();renderDay(activeDay);renderMap();renderToday();renderCloudPanels();applyReadonly()}
+function renderAll(){renderNav();renderDashboard();renderHotel();renderTabs();renderDay(activeDay);renderMap();renderToday();renderTools();renderCloudPanels();applyReadonly()}
 function renderCloudPanels(){
   if(tripId){$("#noTripPanel").classList.add("hidden");$("#tripManagePanel").classList.remove("hidden");$("#syncBar").classList.remove("hidden")}else{$("#noTripPanel").classList.remove("hidden");$("#tripManagePanel").classList.add("hidden");$("#syncBar").classList.add("hidden")}
 }
@@ -222,6 +346,80 @@ function applyReadonly(){
   document.querySelectorAll(".readonly-banner").forEach(x=>x.remove());
   if(readonly){document.body.insertAdjacentHTML("afterbegin",'<div class="readonly-banner">唯讀分享模式｜最後更新 '+esc(edits.lastModified?new Date(edits.lastModified).toLocaleString("zh-TW"):"—")+"</div>");$("#syncBar").classList.add("hidden")}
 }
+
+function findAnyItem(id){
+  for(const d of trip.days){
+    for(const p of [0,1]){
+      const x=baseItemsForDay(d,p).find(i=>i.id===id);
+      if(x)return mergedItem(x);
+    }
+  }
+  return edits.addedItems.find(x=>x.id===id);
+}
+function renderTools(){
+  if(readonly)return;
+  $$(".tool-tabs button").forEach(b=>b.onclick=()=>{
+    $$(".tool-tabs button").forEach(x=>x.classList.remove("active"));
+    $$(".tool-panel").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");$("#"+b.dataset.tool).classList.add("active");
+  });
+  renderFavorites();renderShopping();renderLuggage();renderDiary();renderAssistant();
+  const yen=$("#yenInput"),rate=$("#rateInput"),out=$("#twdOutput");
+  if(yen&&rate&&out){
+    rate.value=edits.currencyRate||0.205;
+    const update=()=>{edits.currencyRate=Number(rate.value)||0.205;out.textContent="NT$"+Math.round((Number(yen.value)||0)*edits.currencyRate).toLocaleString();persistLocal()};
+    yen.oninput=update;rate.oninput=update;update();
+  }
+}
+function renderFavorites(){
+  const items=(edits.favorites||[]).map(findAnyItem).filter(Boolean);
+  $("#favoriteList").innerHTML=items.length?items.map(x=>`<article class="tool-card"><div><h4>${esc(x.title)}</h4><p>${esc(x.place)}</p></div><div class="tool-actions"><a target="_blank" href="${directionUrl(x.mapsQuery||x.place)}">導航</a><button onclick="toggleFavorite('${x.id}')">移除</button></div></article>`).join(""):'<div class="today-empty">尚未收藏景點。</div>';
+}
+function renderShopping(){
+  const total=edits.shopping.reduce((s,x)=>s+(Number(x.amount)||0),0),done=edits.shopping.filter(x=>x.done).length;
+  $("#shoppingStats").innerHTML=`<div><b>${edits.shopping.length}</b><span>全部</span></div><div><b>${done}</b><span>已買</span></div><div><b>¥${total.toLocaleString()}</b><span>總金額</span></div>`;
+  $("#shoppingList").innerHTML=edits.shopping.map(x=>`<article class="tool-card ${x.done?"done":""}"><div><h4>${esc(x.name)}</h4><p>${esc(x.place||"未指定")}｜¥${Number(x.amount||0).toLocaleString()}</p><p>${esc(x.recipient||"")}</p></div><div class="tool-actions"><button onclick="toggleShopping('${x.id}')">✓</button><button onclick="editShopping('${x.id}')">編輯</button><button onclick="deleteShopping('${x.id}')">刪除</button></div></article>`).join("")||'<div class="today-empty">尚無必買商品。</div>';
+}
+window.toggleShopping=id=>{const x=edits.shopping.find(v=>v.id===id);x.done=!x.done;queueCloudSave()};
+window.deleteShopping=id=>{if(confirm("刪除此商品？")){edits.shopping=edits.shopping.filter(x=>x.id!==id);queueCloudSave()}};
+window.editShopping=id=>{const x=edits.shopping.find(v=>v.id===id);openEditor("編輯必買",[
+  {name:"name",label:"商品",type:"text",value:x.name},{name:"place",label:"購買地點",type:"text",value:x.place},{name:"amount",label:"金額（日圓）",type:"text",value:x.amount},{name:"recipient",label:"送禮對象",type:"text",value:x.recipient}
+],v=>{Object.assign(x,v,{amount:Number(v.amount)||0});queueCloudSave()})};
+function addShoppingItem(){openEditor("新增必買",[
+  {name:"name",label:"商品",type:"text",value:""},{name:"place",label:"購買地點",type:"text",value:""},{name:"amount",label:"金額（日圓）",type:"text",value:"0"},{name:"recipient",label:"送禮對象",type:"text",value:""}
+],v=>{edits.shopping.unshift({...v,id:"shop-"+crypto.randomUUID(),amount:Number(v.amount)||0,done:false});queueCloudSave()})}
+function renderLuggage(){
+  const group=(title,key)=>`<section class="luggage-group"><h4>${title}</h4>${edits.luggage[key].map(x=>`<label class="check-row ${x.done?"done":""}"><input type="checkbox" ${x.done?"checked":""} onchange="toggleLuggage('${key}','${x.id}')"><span>${esc(x.name)}</span><button onclick="deleteLuggage('${key}','${x.id}');return false;">刪除</button></label>`).join("")}</section>`;
+  $("#luggageLists").innerHTML=group("出發前","outbound")+group("回程前","return");
+}
+window.toggleLuggage=(key,id)=>{const x=edits.luggage[key].find(v=>v.id===id);x.done=!x.done;queueCloudSave()};
+window.deleteLuggage=(key,id)=>{edits.luggage[key]=edits.luggage[key].filter(x=>x.id!==id);queueCloudSave()};
+function addLuggageItem(){openEditor("新增行李",[
+  {name:"group",label:"分類（outbound 或 return）",type:"text",value:"outbound"},{name:"name",label:"項目",type:"text",value:""}
+],v=>{const key=v.group==="return"?"return":"outbound";edits.luggage[key].push({id:"lug-"+crypto.randomUUID(),name:v.name,done:false});queueCloudSave()})}
+function renderDiary(){
+  $("#diaryList").innerHTML=edits.diary.map(x=>`<article class="tool-card"><div><h4>${esc(x.date)}</h4><p>${esc(x.text)}</p></div><div class="tool-actions"><button onclick="editDiary('${x.id}')">編輯</button><button onclick="deleteDiary('${x.id}')">刪除</button></div></article>`).join("")||'<div class="today-empty">尚無日記。</div>';
+}
+window.deleteDiary=id=>{edits.diary=edits.diary.filter(x=>x.id!==id);queueCloudSave()};
+window.editDiary=id=>{const x=edits.diary.find(v=>v.id===id);openEditor("編輯日記",[
+  {name:"date",label:"日期",type:"text",value:x.date},{name:"text",label:"內容",type:"textarea",value:x.text}
+],v=>{Object.assign(x,v);queueCloudSave()})};
+function addDiaryItem(){openEditor("新增日記",[
+  {name:"date",label:"日期",type:"text",value:dateKey()},{name:"text",label:"內容",type:"textarea",value:""}
+],v=>{edits.diary.unshift({...v,id:"diary-"+crypto.randomUUID()});queueCloudSave()})}
+function renderAssistant(){
+  const select=$("#assistantDay");if(!select)return;
+  select.innerHTML=trip.days.map(d=>`<option value="${d.day}">Day ${d.day}｜${esc(d.title)}</option>`).join("");
+}
+async function copyAssistantPrompt(){
+  const day=trip.days.find(d=>d.day===Number($("#assistantDay").value));
+  const items=itemsForDay(day).map(x=>`${x.time} ${x.title}（${x.place}）`).join("\\n");
+  const q=$("#assistantQuestion").value.trim()||"請依天氣與交通，提供當天行程優化建議。";
+  const prompt=`我正在規劃大阪自由行。\\n${day.date} Day ${day.day}：${day.title}\\n行程：\\n${items}\\n問題：${q}\\n請以繁體中文、簡潔具體回答，並優先考量交通順路、夏季高溫與獨旅安全。`;
+  await copyText(prompt);
+  window.open("https://chatgpt.com/","_blank");
+}
+
 async function loadAllWeather(){await Promise.all(trip.days.map(loadWeatherForDay));renderForecast();renderDay(activeDay);renderToday()}
 async function loadWeatherForDay(day){
   const c=cityCoords[day.weather.location];
@@ -230,8 +428,15 @@ async function loadWeatherForDay(day){
 function renderForecast(){$("#forecastStrip").innerHTML=trip.days.map(d=>{const w=weatherCache[d.date];return `<div class="forecast-card"><small>Day ${d.day}</small>${w&&!w.wait?`<b>${w.icon}</b><span>${Math.round(w.min)}–${Math.round(w.max)}°</span><small>降雨 ${w.rain}%</small>`:`<b>—</b><span>尚未開放</span><small>${esc(d.city)}</small>`}</div>`}).join("")}
 async function init(){
   try{
-    [trip,hotel]=await Promise.all([loadJson("./public/data/osaka-2026.json"),loadJson("./public/data/hotel.json")]);
+    [trip,hotel,defaultShopping,defaultLuggage]=await Promise.all([loadJson("./public/data/osaka-2026.json"),loadJson("./public/data/hotel.json"),loadJson("./public/data/shopping.json"),loadJson("./public/data/luggage.json")]);
     loadLocalEdits();
+    edits.dayOrders=edits.dayOrders||{};
+    edits.favorites=Array.isArray(edits.favorites)?edits.favorites:[];
+    edits.hotelBooking=edits.hotelBooking||{};
+    edits.shopping=Array.isArray(edits.shopping)&&edits.shopping.length?edits.shopping:(defaultShopping.defaultItems||[]).map(x=>({...x,done:false}));
+    edits.luggage=edits.luggage&&Array.isArray(edits.luggage.outbound)?edits.luggage:{outbound:(defaultLuggage.outbound||[]).map((name,i)=>({id:"out-"+i,name,done:false})),return:(defaultLuggage.return||[]).map((name,i)=>({id:"ret-"+i,name,done:false}))};
+    edits.diary=Array.isArray(edits.diary)?edits.diary:[];
+    edits.currencyRate=Number(edits.currencyRate)||0.205;
     if(tripId&&activeToken()){try{await fetchCloud();setSync("雲端已連線")}catch(e){console.error(e);setSync("雲端讀取失敗，顯示本機資料")}}
     $("#boot").classList.add("hidden");$("#app").classList.remove("hidden");renderAll();loadAllWeather();
     if(tripId&&activeToken())setInterval(async()=>{if(document.hidden)return;try{const before=JSON.stringify(edits);await fetchCloud();if(JSON.stringify(edits)!==before){renderAll();setSync("已收到其他裝置更新")}}catch{}},7000);
@@ -250,4 +455,8 @@ $("#exportState").onclick=()=>{const a=document.createElement("a");a.href=URL.cr
 $("#importState").onchange=e=>{const r=new FileReader();r.onload=()=>{try{edits={...edits,...JSON.parse(r.result)};queueCloudSave()}catch{alert("檔案格式錯誤")}};r.readAsText(e.target.files[0])};
 $("#clearEdits").onclick=()=>{if(confirm("清除所有個人修改？原始行程仍會保留。")){const share=edits.shareToken;edits={version:1,itemOverrides:{},hiddenItems:[],addedItems:[],hotelImage:"",selectedDay6Plan:0,lastModified:null,shareToken:share};queueCloudSave()}};
 
+$("#addShopping").onclick=addShoppingItem;
+$("#addLuggage").onclick=addLuggageItem;
+$("#addDiary").onclick=addDiaryItem;
+$("#copyAssistantPrompt").onclick=copyAssistantPrompt;
 init();
