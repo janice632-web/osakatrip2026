@@ -1,16 +1,27 @@
-V3.3.1 依時間排序修正
+V3.4 Day 3／Day 5 行程更新
 
-覆蓋：
-- assets/smart-route.js
+新增／覆蓋：
+- assets/app.js
 - assets/app.css
+- assets/smart-route.js
+- assets/trip-health.js
+- public/data/day-overrides.json（新增）
 - index.html
 - service-worker.js
 
-修正：
-- 支援上午、下午、傍晚、晚上、全天、彈性等時間
-- 排序成功顯示提示
-- 已是正確順序時顯示提示
-- 更新快取版本
+不要覆蓋：
+- public/data/osaka-2026.json
+- public/data/hotel.json
+- icons/
+- SUPABASE_SETUP.sql
+
+更新內容：
+- Day 3 改為梅田購物日
+- Day 5 增加主方案／備案
+- 主方案狀態：待確認成團／已確認／未成團
+- 主方案與備案各自保留排序
+- 其他 Day 1、2、4、6 不變
+- 後續更新只要保留 day-overrides.json，即不會換回舊行程
 
 Commit：
-V3.3.1 time sort feedback fix
+V3.4 Day3 Umeda and Day5 backup plan

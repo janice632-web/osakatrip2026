@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 1,
+  "description": "User-defined itinerary overrides. Only listed days replace the original itinerary.",
+  "days": [
+    {
+      "day": 3,
+      "date": "2026-08-14",
+      "city": "大阪",
+      "title": "梅田購物日",
+      "locked": true,
+      "weather": {
+        "location": "Osaka",
+        "status": "dynamic",
+        "source": "Open-Meteo"
+      },
+      "items": [
+        {
+          "id": "d3-umeda-arrival",
+          "time": "10:00",
+          "title": "前往梅田／大阪站",
+          "place": "大阪站・梅田站",
+          "summary": "心齋橋搭御堂筋線直達梅田，先前往大阪站南側的大丸梅田。",
+          "mapsQuery": "Osaka Station",
+          "transport": {
+            "boarding": "心齋橋站 M19",
+            "arrival": "梅田站 M16",
+            "route": "大阪 Metro 御堂筋線"
+          }
+        },
+        {
+          "id": "d3-nintendo",
+          "time": "10:30",
+          "title": "Nintendo OSAKA",
+          "place": "大丸梅田店 13F",
+          "summary": "開店後優先前往，若需整理券依現場公告。",
+          "mapsQuery": "Nintendo OSAKA"
+        },
+        {
+          "id": "d3-pokemon",
+          "time": "11:30",
+          "title": "Pokémon Center Osaka",
+          "place": "大丸梅田店 13F",
+          "summary": "與 Nintendo OSAKA 同樓層，可一起逛。",
+          "mapsQuery": "Pokemon Center Osaka"
+        },
+        {
+          "id": "d3-daimaru-lunch",
+          "time": "12:30",
+          "title": "大丸梅田／大阪站午餐",
+          "place": "大丸梅田店・大阪站",
+          "summary": "依現場候位彈性選擇午餐，也可先逛大丸百貨。",
+          "mapsQuery": "Daimaru Umeda"
+        },
+        {
+          "id": "d3-lucua",
+          "time": "14:00",
+          "title": "LUCUA Osaka",
+          "place": "LUCUA Osaka",
+          "summary": "服飾、美妝、生活選物與伴手禮集中。",
+          "mapsQuery": "LUCUA Osaka"
+        },
+        {
+          "id": "d3-yodobashi",
+          "time": "16:00",
+          "title": "Yodobashi Umeda／LINKS UMEDA",
+          "place": "Yodobashi Camera Multimedia Umeda",
+          "summary": "電器、美容家電、玩具與生活用品。",
+          "mapsQuery": "Yodobashi Camera Multimedia Umeda"
+        },
+        {
+          "id": "d3-grandfront",
+          "time": "18:00",
+          "title": "Grand Front Osaka",
+          "place": "Grand Front Osaka",
+          "summary": "傍晚逛北館、南館，依體力安排晚餐。",
+          "mapsQuery": "Grand Front Osaka"
+        },
+        {
+          "id": "d3-night-option",
+          "time": "晚上",
+          "title": "梅田夜間備選",
+          "place": "HEP FIVE／梅田藍天大廈",
+          "summary": "依購物進度與體力，擇一看夜景或直接回心齋橋。",
+          "mapsQuery": "HEP FIVE"
+        }
+      ]
+    },
+    {
+      "day": 5,
+      "date": "2026-08-16",
+      "city": "神戶",
+      "title": "神戶一日遊｜主方案／備案",
+      "locked": true,
+      "planStatusOptions": [
+        "待確認成團",
+        "已確認",
+        "未成團／已取消"
+      ],
+      "defaultPlanStatus": "待確認成團",
+      "weather": {
+        "location": "Kobe",
+        "status": "dynamic",
+        "source": "Open-Meteo"
+      },
+      "plans": [
+        {
+          "name": "主方案｜KKday 神戶一日遊",
+          "statusKey": "day5-main",
+          "locked": true,
+          "summary": "目前待確認成團。集合時間與站點以 KKday 最終電子憑證為準。",
+          "items": [
+            {
+              "id": "d5a-meeting",
+              "time": "待憑證",
+              "title": "KKday 集合／飯店接送",
+              "place": "大阪市區指定集合點",
+              "summary": "請依最終憑證確認集合地點，至少提前 15 分鐘抵達。",
+              "mapsQuery": "Shinsaibashi Osaka",
+              "details": {
+                "operationNote": "商品頁標示最少成團 6 人；若未達成團人數，將於出發日前通知。"
+              }
+            },
+            {
+              "id": "d5a-kobe-harbor",
+              "time": "下午",
+              "title": "神戶港／Mosaic",
+              "place": "Kobe Harborland",
+              "summary": "海港散步、摩天輪周邊與自由用餐，實際停靠依當日導遊安排。",
+              "mapsQuery": "Kobe Harborland Mosaic"
+            },
+            {
+              "id": "d5a-kitano",
+              "time": "下午",
+              "title": "北野異人館街",
+              "place": "Kitano Ijinkan-Gai",
+              "summary": "洋館街散策；實際順序與停留時間依團體行程。",
+              "mapsQuery": "Kitano Ijinkan Kobe"
+            },
+            {
+              "id": "d5a-arima",
+              "time": "傍晚",
+              "title": "有馬溫泉",
+              "place": "有馬溫泉",
+              "summary": "可漫步溫泉老街或依方案自費泡湯。",
+              "mapsQuery": "Arima Onsen"
+            },
+            {
+              "id": "d5a-rokko",
+              "time": "晚上",
+              "title": "六甲山夜景",
+              "place": "六甲山",
+              "summary": "依天候與交通狀況觀賞神戶夜景，山上溫差較大。",
+              "mapsQuery": "Rokko Garden Terrace"
+            },
+            {
+              "id": "d5a-return",
+              "time": "晚上",
+              "title": "返回大阪",
+              "place": "心齋橋／道頓堀周邊",
+              "summary": "回程時間依交通狀況調整，當晚避免安排固定預約。",
+              "mapsQuery": "Shinsaibashi Osaka"
+            }
+          ]
+        },
+        {
+          "name": "備案｜神戶自由行",
+          "locked": false,
+          "summary": "未成團時使用，以三宮為中心，港區安排至傍晚。",
+          "items": [
+            {
+              "id": "d5b-sannomiya",
+              "time": "09:30",
+              "title": "大阪前往神戶三宮",
+              "place": "神戶三宮站",
+              "summary": "從大阪／梅田搭阪神或阪急前往三宮。",
+              "mapsQuery": "Kobe Sannomiya Station"
+            },
+            {
+              "id": "d5b-kitano",
+              "time": "10:30",
+              "title": "北野異人館街",
+              "place": "Kitano Ijinkan-Gai",
+              "summary": "由三宮往山側散步，夏季注意坡道與補水。",
+              "mapsQuery": "Kitano Ijinkan Kobe"
+            },
+            {
+              "id": "d5b-ikuta",
+              "time": "12:30",
+              "title": "生田神社",
+              "place": "生田神社",
+              "summary": "返回三宮途中參拜，再前往南京町。",
+              "mapsQuery": "Ikuta Jinja"
+            },
+            {
+              "id": "d5b-nankinmachi",
+              "time": "13:30",
+              "title": "南京町",
+              "place": "神戶南京町",
+              "summary": "安排午餐與街邊小吃。",
+              "mapsQuery": "Nankinmachi Kobe"
+            },
+            {
+              "id": "d5b-harborland",
+              "time": "15:30",
+              "title": "神戶港・Harborland・Mosaic",
+              "place": "Kobe Harborland",
+              "summary": "港區購物、海景散步與晚餐，可待到點燈。",
+              "mapsQuery": "Kobe Harborland Mosaic"
+            },
+            {
+              "id": "d5b-return",
+              "time": "19:30",
+              "title": "返回大阪",
+              "place": "神戶站／三宮站",
+              "summary": "依所在位置搭 JR、阪神或阪急返回大阪。",
+              "mapsQuery": "Kobe Station"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

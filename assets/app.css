@@ -78,3 +78,9 @@ menu{display:flex;justify-content:flex-end;gap:8px;padding:12px 0 0;margin:0}
 
 .sort-toast{position:fixed;left:50%;bottom:92px;z-index:999;transform:translate(-50%,16px);background:#28241f;color:#fff;border-radius:999px;padding:10px 16px;font-size:13px;font-weight:900;opacity:0;pointer-events:none;transition:.2s;box-shadow:0 10px 30px rgba(0,0,0,.22)}
 .sort-toast.show{opacity:1;transform:translate(-50%,0)}
+
+.plan-status{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px}
+.plan-status label{font-size:12px;font-weight:900}
+.plan-status select{margin-left:6px;border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:#fff}
+.status-waiting,.status-confirmed,.status-cancelled{border-radius:999px;padding:6px 9px;font-size:11px;font-weight:900}
+.status-waiting{background:#fff0cc;color:#725400}.status-confirmed{background:#e2f2e5;color:#315e3b}.status-cancelled{background:#f8e5df;color:#9c4234}

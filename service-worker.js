@@ -1,4 +1,4 @@
-const CACHE_NAME = 'travel-companion-v3-3-1-timesort1';
+const CACHE_NAME = 'travel-companion-v3-4-0-dayplans1';
 const APP_SHELL = [
   './',
   './index.html',
@@ -8,7 +8,7 @@ const APP_SHELL = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './public/data/osaka-2026.json',
-  './public/data/hotel.json',
+  './public/data/hotel.json','./public/data/day-overrides.json',
   './public/data/transport.json',
   './public/data/shopping.json',
   './public/data/luggage.json',

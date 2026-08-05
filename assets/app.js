@@ -32,7 +32,7 @@ const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const params=new URLSearchParams(location.search);
 let tripId=params.get("trip"), editToken=params.get("key"), readToken=params.get("view");
 let readonly=!!readToken&&!editToken;
-let trip,hotel,activeDay=1,weatherCache={},cloudTimer=null,lastCloudUpdated=null;
+let trip,hotel,dayOverrides,activeDay=1,weatherCache={},cloudTimer=null,lastCloudUpdated=null;
 let edits={
   version:5,
   itemOverrides:{},
@@ -101,6 +101,8 @@ function migrateEdits(raw){
     originalDayOrders:{},
     routeFixed:{},
     routeCoordinates:{},
+    selectedPlans:{},
+    planStatuses:{},
     prepItems:[
       {id:"prep-passport",name:"護照",done:false},
       {id:"prep-vjw",name:"Visit Japan Web",done:false},
@@ -121,6 +123,8 @@ function migrateEdits(raw){
   next.originalDayOrders={...defaults.originalDayOrders,...(previous.originalDayOrders||{})};
   next.routeFixed={...defaults.routeFixed,...(previous.routeFixed||{})};
   next.routeCoordinates={...defaults.routeCoordinates,...(previous.routeCoordinates||{})};
+  next.selectedPlans={...defaults.selectedPlans,...(previous.selectedPlans||{})};
+  next.planStatuses={...defaults.planStatuses,...(previous.planStatuses||{})};
   next.hiddenItems=Array.isArray(previous.hiddenItems)?previous.hiddenItems:[];
   next.addedItems=Array.isArray(previous.addedItems)?previous.addedItems:[];
   next.prepItems=Array.isArray(previous.prepItems)&&previous.prepItems.length?previous.prepItems:defaults.prepItems;
@@ -174,13 +178,13 @@ function mergedItem(item){
 }
 function isHidden(id){return edits.hiddenItems.includes(id)}
 function dayFromToday(){const key=dateKey();return trip.days.find(d=>d.date===key)?.day||null}
-function baseItemsForDay(day,planIndex=edits.selectedDay6Plan||0){
+function baseItemsForDay(day,planIndex=selectedPlanForDay(day.day)){
   const base=[...(day.items||[])];
   if(day.plans?.length)base.unshift(...day.plans[planIndex].items);
   return base;
 }
-function orderKey(day,planIndex=edits.selectedDay6Plan||0){return "day-"+day.day+"-plan-"+planIndex}
-function itemsForDay(day,planIndex=edits.selectedDay6Plan||0){
+function orderKey(day,planIndex=selectedPlanForDay(day.day)){return "day-"+day.day+"-plan-"+planIndex}
+function itemsForDay(day,planIndex=selectedPlanForDay(day.day)){
   const base=baseItemsForDay(day,planIndex).filter(x=>!isHidden(x.id)).map(mergedItem);
   const added=edits.addedItems.filter(x=>Number(x.day)===Number(day.day)&&!isHidden(x.id)).map(mergedItem);
   const all=[...base,...added];
@@ -248,19 +252,41 @@ function renderTabs(){
   $("#dayTabs").innerHTML=trip.days.map(d=>`<button data-day="${d.day}" class="${d.day===activeDay?"active":""}">Day ${d.day}</button>`).join("");
   $$("#dayTabs button").forEach(b=>b.onclick=()=>{activeDay=Number(b.dataset.day);renderTabs();renderDay(activeDay)});
 }
-function renderDay(dayNo,planIndex=edits.selectedDay6Plan||0){
+function renderDay(dayNo,planIndex=null){
   const d=trip.days.find(x=>x.day===dayNo);
-  if(d.plans?.length)edits.selectedDay6Plan=planIndex;
+  if(planIndex===null)planIndex=selectedPlanForDay(dayNo);
+  if(d.plans?.length){
+    edits.selectedPlans=edits.selectedPlans||{};
+    edits.selectedPlans[dayNo]=planIndex;
+  }
   window.currentRenderedDay=d;
   window.currentRenderedPlan=planIndex;
-  let planSwitch=d.plans?.length?`<div class="plan-switch">${d.plans.map((p,i)=>`<button data-plan="${i}" class="${i===planIndex?"active":""}">${esc(p.name)}</button>`).join("")}</div>`:"";
+  let planSwitch="";
+  if(d.plans?.length){
+    planSwitch=`<div class="plan-switch">${d.plans.map((p,i)=>`<button data-plan="${i}" class="${i===planIndex?"active":""}">${esc(p.name)}</button>`).join("")}</div>`;
+  }
+  const statusOptions=d.planStatusOptions||[];
+  const currentStatus=planStatusForDay(d);
+  const statusControl=statusOptions.length?`<div class="plan-status">
+    <label>主方案狀態
+      <select id="dayPlanStatus">${statusOptions.map(x=>`<option value="${esc(x)}" ${x===currentStatus?"selected":""}>${esc(x)}</option>`).join("")}</select>
+    </label>
+    ${currentStatus==="待確認成團"?'<span class="status-waiting">尚未確認成團</span>':currentStatus==="已確認"?'<span class="status-confirmed">已確認</span>':'<span class="status-cancelled">未成團／已取消</span>'}
+  </div>`:"";
   const items=itemsForDay(d,planIndex);
   const smartTools=!readonly&&window.renderSmartSortToolbar?window.renderSmartSortToolbar(d,planIndex,items):"";
   const health=window.renderTripHealth?window.renderTripHealth(d,planIndex,items):"";
-  $("#dayContent").innerHTML=`<div class="day-header"><small>DAY ${d.day} · ${d.date.replaceAll("-","/")}</small><h3>${esc(d.title)}</h3><p>${esc(d.city)}</p>${smartTools}</div>${weatherHtml(d)}${planSwitch}${health}<div id="sortableCards" data-day="${d.day}" data-plan="${planIndex}">${items.map((x,i)=>placeCard(x,items[i+1],i,items.length)).join("")}</div>${!readonly?`<button class="primary-action" onclick="addItem(${dayNo})">新增 Day ${dayNo} 行程</button>`:""}`;
+  $("#dayContent").innerHTML=`<div class="day-header"><small>DAY ${d.day} · ${d.date.replaceAll("-","/")}</small><h3>${esc(d.title)}</h3><p>${esc(d.city)}</p>${statusControl}${smartTools}</div>${weatherHtml(d)}${planSwitch}${health}<div id="sortableCards" data-day="${d.day}" data-plan="${planIndex}">${items.map((x,i)=>placeCard(x,items[i+1],i,items.length)).join("")}</div>${!readonly?`<button class="primary-action" onclick="addItem(${dayNo})">新增 Day ${dayNo} 行程</button>`:""}`;
   bindCards();
   if(window.bindSmartSortToolbar)window.bindSmartSortToolbar(d,planIndex,items);
-  $$(".plan-switch button").forEach(b=>b.onclick=()=>{edits.selectedDay6Plan=Number(b.dataset.plan);persistLocal();renderDay(dayNo,Number(b.dataset.plan))});
+  $("#dayPlanStatus")?.addEventListener("change",e=>setDayPlanStatus(dayNo,e.target.value));
+  $$(".plan-switch button").forEach(b=>b.onclick=()=>{
+    const next=Number(b.dataset.plan);
+    edits.selectedPlans=edits.selectedPlans||{};
+    edits.selectedPlans[dayNo]=next;
+    persistLocal();
+    renderDay(dayNo,next);
+  });
 }
 function placeCard(x,next,index,total){
   const rows=[],t=x.transport||{},det=x.details||{};
@@ -405,9 +431,33 @@ async function loadWeatherForDay(day){
   try{const url=`https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&start_date=${day.date}&end_date=${day.date}`;const r=await fetch(url,{cache:"no-store"});if(!r.ok)throw new Error();const j=await r.json();if(!j.daily?.time?.length){weatherCache[day.date]={wait:true};return}const code=j.daily.weather_code[0],[icon,label]=weatherCodes[code]||["🌡️","天氣資訊"];weatherCache[day.date]={icon,label,max:j.daily.temperature_2m_max[0],min:j.daily.temperature_2m_min[0],rain:j.daily.precipitation_probability_max[0]??0}}catch{weatherCache[day.date]={wait:true}}
 }
 function renderForecast(){$("#forecastStrip").innerHTML=trip.days.map(d=>{const w=weatherCache[d.date];return `<div class="forecast-card"><small>Day ${d.day}</small>${w&&!w.wait?`<b>${w.icon}</b><span>${Math.round(w.min)}–${Math.round(w.max)}°</span><small>降雨 ${w.rain}%</small>`:`<b>—</b><span>尚未開放</span><small>${esc(d.city)}</small>`}</div>`}).join("")}
+
+function applyDayOverrides(baseTrip,overrides){
+  if(!overrides?.days?.length)return baseTrip;
+  const replacements=new Map(overrides.days.map(day=>[Number(day.day),day]));
+  return {
+    ...baseTrip,
+    days:baseTrip.days.map(day=>replacements.has(Number(day.day))?replacements.get(Number(day.day)):day)
+  };
+}
+function selectedPlanForDay(dayNo){
+  edits.selectedPlans=edits.selectedPlans||{};
+  return Number(edits.selectedPlans[dayNo]??0);
+}
+function planStatusForDay(day){
+  edits.planStatuses=edits.planStatuses||{};
+  return edits.planStatuses[day.day]||day.defaultPlanStatus||"";
+}
+window.setDayPlanStatus=(dayNo,value)=>{
+  edits.planStatuses=edits.planStatuses||{};
+  edits.planStatuses[dayNo]=value;
+  queueCloudSave();
+};
+
 async function init(){
   try{
-    [trip,hotel]=await Promise.all([loadJson("./public/data/osaka-2026.json"),loadJson("./public/data/hotel.json")]);
+    [trip,hotel,dayOverrides]=await Promise.all([loadJson("./public/data/osaka-2026.json"),loadJson("./public/data/hotel.json"),loadJson("./public/data/day-overrides.json").catch(()=>({days:[]}))]);
+    trip=applyDayOverrides(trip,dayOverrides);
     loadLocalEdits();
     if(tripId&&activeToken()){try{await fetchCloud();setSync("雲端已連線")}catch(e){console.error(e);setSync("雲端讀取失敗，顯示本機資料")}}
     $("#boot").classList.add("hidden");$("#app").classList.remove("hidden");renderAll();loadAllWeather();
