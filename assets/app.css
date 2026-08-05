@@ -84,3 +84,23 @@ menu{display:flex;justify-content:flex-end;gap:8px;padding:12px 0 0;margin:0}
 .plan-status select{margin-left:6px;border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:#fff}
 .status-waiting,.status-confirmed,.status-cancelled{border-radius:999px;padding:6px 9px;font-size:11px;font-weight:900}
 .status-waiting{background:#fff0cc;color:#725400}.status-confirmed{background:#e2f2e5;color:#315e3b}.status-cancelled{background:#f8e5df;color:#9c4234}
+
+.day6-planb-toggle{
+  margin-top:12px;
+  padding:11px 13px;
+  border-radius:14px;
+  background:#fff7e8;
+  border:1px solid #ead7b3;
+}
+.day6-planb-toggle label{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-size:13px;
+  font-weight:900;
+  cursor:pointer;
+}
+.day6-planb-toggle input{
+  width:18px;
+  height:18px;
+}

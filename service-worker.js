@@ -1,4 +1,4 @@
-const CACHE_NAME = 'travel-companion-v3-4-0-dayplans1';
+const CACHE_NAME = 'travel-companion-v3-4-1-day6planb1';
 const APP_SHELL = [
   './',
   './index.html',

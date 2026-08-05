@@ -41,6 +41,8 @@ let edits={
   hotelImage:"",
   hotelBooking:{},
   selectedDay6Plan:0,
+    day6PlanBEnabled:true,
+  day6PlanBEnabled:true,
   dayOrders:{},
   prepItems:[],
   shopping:[],
@@ -117,6 +119,7 @@ function migrateEdits(raw){
     lastModified:null
   };
   const next={...defaults,...previous};
+  next.day6PlanBEnabled=previous.day6PlanBEnabled!==false;
   next.itemOverrides={...defaults.itemOverrides,...(previous.itemOverrides||{})};
   next.hotelBooking={...defaults.hotelBooking,...(previous.hotelBooking||{})};
   next.dayOrders={...defaults.dayOrders,...(previous.dayOrders||{})};
@@ -252,38 +255,104 @@ function renderTabs(){
   $("#dayTabs").innerHTML=trip.days.map(d=>`<button data-day="${d.day}" class="${d.day===activeDay?"active":""}">Day ${d.day}</button>`).join("");
   $$("#dayTabs button").forEach(b=>b.onclick=()=>{activeDay=Number(b.dataset.day);renderTabs();renderDay(activeDay)});
 }
+
+function isDay6PlanBEnabled(){
+  return edits.day6PlanBEnabled!==false;
+}
+window.toggleDay6PlanB=(enabled)=>{
+  edits.day6PlanBEnabled=!!enabled;
+  if(!edits.day6PlanBEnabled){
+    edits.selectedPlans=edits.selectedPlans||{};
+    edits.selectedPlans[6]=0;
+    edits.selectedDay6Plan=0;
+  }
+  queueCloudSave();
+};
+
 function renderDay(dayNo,planIndex=null){
   const d=trip.days.find(x=>x.day===dayNo);
-  if(planIndex===null)planIndex=selectedPlanForDay(dayNo);
-  if(d.plans?.length){
-    edits.selectedPlans=edits.selectedPlans||{};
-    edits.selectedPlans[dayNo]=planIndex;
+
+  if(planIndex===null){
+    if(typeof selectedPlanForDay==="function") planIndex=selectedPlanForDay(dayNo);
+    else planIndex=edits.selectedDay6Plan||0;
   }
+
+  if(dayNo===6 && !isDay6PlanBEnabled()) planIndex=0;
+
+  if(d.plans?.length){
+    if(edits.selectedPlans){
+      edits.selectedPlans[dayNo]=planIndex;
+    }else{
+      edits.selectedDay6Plan=planIndex;
+    }
+  }
+
   window.currentRenderedDay=d;
   window.currentRenderedPlan=planIndex;
+
+  const visiblePlans=d.plans?.length
+    ? d.plans.filter((p,i)=>!(dayNo===6 && i===1 && !isDay6PlanBEnabled()))
+    : [];
+
   let planSwitch="";
-  if(d.plans?.length){
-    planSwitch=`<div class="plan-switch">${d.plans.map((p,i)=>`<button data-plan="${i}" class="${i===planIndex?"active":""}">${esc(p.name)}</button>`).join("")}</div>`;
+  if(visiblePlans.length){
+    planSwitch=`<div class="plan-switch">${visiblePlans.map(p=>{
+      const originalIndex=d.plans.indexOf(p);
+      return `<button data-plan="${originalIndex}" class="${originalIndex===planIndex?"active":""}">${esc(p.name)}</button>`;
+    }).join("")}</div>`;
   }
+
+  const day6Toggle=!readonly && dayNo===6 && d.plans?.length>1
+    ? `<div class="day6-planb-toggle">
+        <label>
+          <input id="day6PlanBToggle" type="checkbox" ${isDay6PlanBEnabled()?"checked":""}>
+          <span>啟用 Plan B 神戶半日遊</span>
+        </label>
+       </div>`
+    : "";
+
   const statusOptions=d.planStatusOptions||[];
-  const currentStatus=planStatusForDay(d);
+  const currentStatus=typeof planStatusForDay==="function"?planStatusForDay(d):"";
   const statusControl=statusOptions.length?`<div class="plan-status">
     <label>主方案狀態
       <select id="dayPlanStatus">${statusOptions.map(x=>`<option value="${esc(x)}" ${x===currentStatus?"selected":""}>${esc(x)}</option>`).join("")}</select>
     </label>
-    ${currentStatus==="待確認成團"?'<span class="status-waiting">尚未確認成團</span>':currentStatus==="已確認"?'<span class="status-confirmed">已確認</span>':'<span class="status-cancelled">未成團／已取消</span>'}
   </div>`:"";
+
   const items=itemsForDay(d,planIndex);
   const smartTools=!readonly&&window.renderSmartSortToolbar?window.renderSmartSortToolbar(d,planIndex,items):"";
   const health=window.renderTripHealth?window.renderTripHealth(d,planIndex,items):"";
-  $("#dayContent").innerHTML=`<div class="day-header"><small>DAY ${d.day} · ${d.date.replaceAll("-","/")}</small><h3>${esc(d.title)}</h3><p>${esc(d.city)}</p>${statusControl}${smartTools}</div>${weatherHtml(d)}${planSwitch}${health}<div id="sortableCards" data-day="${d.day}" data-plan="${planIndex}">${items.map((x,i)=>placeCard(x,items[i+1],i,items.length)).join("")}</div>${!readonly?`<button class="primary-action" onclick="addItem(${dayNo})">新增 Day ${dayNo} 行程</button>`:""}`;
+
+  $("#dayContent").innerHTML=`<div class="day-header">
+      <small>DAY ${d.day} · ${d.date.replaceAll("-","/")}</small>
+      <h3>${esc(d.title)}</h3>
+      <p>${esc(d.city)}</p>
+      ${day6Toggle}${statusControl}${smartTools}
+    </div>
+    ${weatherHtml(d)}${planSwitch}${health}
+    <div id="sortableCards" data-day="${d.day}" data-plan="${planIndex}">
+      ${items.map((x,i)=>placeCard(x,items[i+1],i,items.length)).join("")}
+    </div>
+    ${!readonly?`<button class="primary-action" onclick="addItem(${dayNo})">新增 Day ${dayNo} 行程</button>`:""}`;
+
   bindCards();
   if(window.bindSmartSortToolbar)window.bindSmartSortToolbar(d,planIndex,items);
-  $("#dayPlanStatus")?.addEventListener("change",e=>setDayPlanStatus(dayNo,e.target.value));
+
+  $("#day6PlanBToggle")?.addEventListener("change",e=>{
+    toggleDay6PlanB(e.target.checked);
+  });
+
+  $("#dayPlanStatus")?.addEventListener("change",e=>{
+    if(typeof setDayPlanStatus==="function")setDayPlanStatus(dayNo,e.target.value);
+  });
+
   $$(".plan-switch button").forEach(b=>b.onclick=()=>{
     const next=Number(b.dataset.plan);
-    edits.selectedPlans=edits.selectedPlans||{};
-    edits.selectedPlans[dayNo]=next;
+    if(edits.selectedPlans){
+      edits.selectedPlans[dayNo]=next;
+    }else{
+      edits.selectedDay6Plan=next;
+    }
     persistLocal();
     renderDay(dayNo,next);
   });
