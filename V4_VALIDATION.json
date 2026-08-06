@@ -1,0 +1,19 @@
+{
+  "javascript_syntax": "PASS",
+  "single_app_js": true,
+  "public_data_unchanged": true,
+  "public_data_files": {
+    "wishlist.json": true,
+    "hotel.json": true,
+    "day-overrides.json": true,
+    "osaka-2026.json": true,
+    "transport.json": true,
+    "tickets.json": true,
+    "luggage.json": true,
+    "shopping.json": true
+  },
+  "shopping_products": 7,
+  "day6_plan_b_preserved": true,
+  "supabase_payload_migration": "schema v6, additive",
+  "service_worker": "network-first for core files"
+}

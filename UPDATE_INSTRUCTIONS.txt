@@ -1,22 +1,23 @@
-V3.4.3 必買商品匯入修正
+V4.0.0 穩定版更新
 
 覆蓋／新增：
-- assets/app.v343.shopping.js（新增）
+- assets/app.js
 - assets/app.css
 - assets/products/
 - index.html
 - service-worker.js
+- README.md
+- V4_VALIDATION.json
 
-更新後進入「工具 → 必買／代購」：
-- 正常情況會自動新增
-- 若沒有出現，按「匯入 7 項商品」
-- 畫面會顯示新增數量或已存在
+刪除舊檔：
+- assets/smart-route.js
+- assets/trip-health.js
+- assets/app.v343.shopping.js（若存在）
 
-不修改：
+不要動：
 - public/data/
-- 行程
-- 住宿
-- 既有必買／代購資料
+- icons/
+- SUPABASE_SETUP.sql
 
 Commit：
-V3.4.3 shopping import fix
+V4.0.0 stable consolidation

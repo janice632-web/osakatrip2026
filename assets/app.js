@@ -1,3 +1,71 @@
+/* Travel Companion V4.0.0 — consolidated modules */
+/* V3.3 smart route */
+(function(){
+const C={"d3-umeda-arrival":[34.7025,135.4959],"d3-nintendo":[34.7001,135.4965],"d3-pokemon":[34.7001,135.4965],"d3-daimaru-lunch":[34.7001,135.4965],"d3-lucua":[34.7025,135.4955],"d3-yodobashi":[34.704,135.4967],"d3-grandfront":[34.7055,135.4947],"d3-night-option":[34.704,135.4996],"d5a-meeting":[34.6743,135.5007],"d5a-kobe-harbor":[34.6806,135.1868],"d5a-kitano":[34.7007,135.1909],"d5a-arima":[34.797,135.2485],"d5a-rokko":[34.7647,135.2473],"d5a-return":[34.6743,135.5007],"d5b-sannomiya":[34.6949,135.1956],"d5b-kitano":[34.7007,135.1909],"d5b-ikuta":[34.6949,135.1904],"d5b-nankinmachi":[34.688,135.1877],"d5b-harborland":[34.6806,135.1868],"d5b-return":[34.6797,135.1783],"d1-br176":[25.0797,121.2342],"d1-kobe-airport":[34.6328,135.2239],"d1-shinki-bus":[34.6328,135.2239],"d1-hotel-checkin":[34.6747,135.5043],"d1-dotonbori":[34.6687,135.5013],"d2-morinomiya":[34.6815,135.5346],"d2-road-train":[34.6888,135.5352],"d2-osaka-castle":[34.6873,135.5262],"d2-ytv":[34.6943,135.5328],"d2-tennoji":[34.6466,135.5133],"d2-harukas":[34.6461,135.5133],"d3-meeting":[34.6666,135.4958],"d3-arashiyama":[35.0094,135.6668],"d3-kinkakuji":[35.0394,135.7292],"d3-kiyomizu":[34.9949,135.7850],"d3-fushimi":[34.9671,135.7727],"d4-depart":[34.6677,135.4383],"d4-conan":[34.6654,135.4323],"d4-mario":[34.6677,135.4312],"d4-minecart":[34.6675,135.4307],"d4-jurassic":[34.6632,135.4335],"d4-harrypotter":[34.6681,135.4346],"d5-umeda":[34.7025,135.4959],"d5-nintendo":[34.7001,135.4965],"d5-pokemon":[34.7001,135.4965],"d5-lucua":[34.7025,135.4955],"d5-yodobashi":[34.704,135.4967],"d5-cafe":[34.708,135.5001],"d5-grandfront":[34.7055,135.4947],"d6a-shopping":[34.674,135.5017],"d6a-bus":[34.6743,135.5007],"d6b-bus":[34.6743,135.5007],"d6b-portliner":[34.6372,135.2287],"d6b-nankinmachi":[34.688,135.1877],"d6b-return":[34.6949,135.1956],"d6-flight":[34.6328,135.2239]};
+function t(v){
+  const s=String(v||"").trim();
+  const m=s.match(/^(\d{1,2}):(\d{2})/);
+  if(m)return Number(m[1])*60+Number(m[2]);
+  if(/清晨/.test(s))return 420;
+  if(/早上|上午/.test(s))return 540;
+  if(/中午/.test(s))return 720;
+  if(/下午/.test(s))return 840;
+  if(/傍晚/.test(s))return 1050;
+  if(/晚上/.test(s))return 1140;
+  if(/全天/.test(s))return 480;
+  if(/彈性|待定/.test(s))return 9998;
+  return null;
+}
+function fixed(x){return !!(edits.routeFixed&&edits.routeFixed[x.id])||t(x.time)!==null}
+function co(x){return edits.routeCoordinates?.[x.id]||C[x.id]||null}
+function d(a,b){if(!a||!b)return 1e9;const R=Math.PI/180,p=a[0]*R,q=b[0]*R,u=(b[0]-a[0])*R,v=(b[1]-a[1])*R,h=Math.sin(u/2)**2+Math.cos(p)*Math.cos(q)*Math.sin(v/2)**2;return 6371*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h))}
+function save(day,plan,ids,label){const k=orderKey(day,plan);edits.dayOrders=edits.dayOrders||{};edits.originalDayOrders=edits.originalDayOrders||{};if(!edits.originalDayOrders[k]?.length)edits.originalDayOrders[k]=itemsForDay(day,plan).map(x=>x.id);edits.dayOrders[k]=ids;edits.lastSortLabel=label;queueCloudSave()}
+function notify(message){
+  let box=document.getElementById("sortToast");
+  if(!box){
+    box=document.createElement("div");
+    box.id="sortToast";
+    box.className="sort-toast";
+    document.body.appendChild(box);
+  }
+  box.textContent=message;
+  box.classList.add("show");
+  clearTimeout(box._timer);
+  box._timer=setTimeout(()=>box.classList.remove("show"),2200);
+}
+function byTime(day,plan){
+  const before=itemsForDay(day,plan);
+  const sorted=[...before].sort((x,y)=>{
+    const A=t(x.time),B=t(y.time);
+    if(A===null&&B===null)return 0;
+    if(A===null)return 1;
+    if(B===null)return -1;
+    return A-B;
+  });
+  const beforeIds=before.map(x=>x.id);
+  const afterIds=sorted.map(x=>x.id);
+  if(afterIds.every((id,i)=>id===beforeIds[i])){
+    notify("目前已依時間排列");
+    return;
+  }
+  save(day,plan,afterIds,"依時間排序");
+  notify("已依時間重新排序");
+}
+function nearest(seg,start){const left=[...seg],out=[];let cur=start;while(left.length){let bi=0,bd=Infinity;left.forEach((x,i)=>{const z=d(cur,co(x));if(z<bd){bd=z;bi=i}});const x=left.splice(bi,1)[0];out.push(x);cur=co(x)||cur}return out}
+function route(day,plan){const a=itemsForDay(day,plan);if(a.length<3)return alert("景點數量不足，不需要排序。");let out=[],seg=[],prev=null;const flush=()=>{if(seg.length){const s=nearest(seg,prev||co(seg[0]));out.push(...s);prev=co(s[s.length-1])||prev;seg=[]}};a.forEach(x=>{if(fixed(x)){flush();out.push(x);prev=co(x)||prev}else seg.push(x)});flush();if(out.every((x,i)=>x.id===a[i].id))return alert("目前順序已接近最佳，或彈性景點不足。");if(confirm("智慧排序預覽：\n\n"+out.map(x=>x.title).join(" → ")+"\n\n固定時間與已釘選行程不會移動。是否套用？"))save(day,plan,out.map(x=>x.id),"智慧路線排序")}
+function restore(day,plan){const k=orderKey(day,plan),ids=edits.originalDayOrders?.[k];if(!ids?.length)return alert("尚無可還原的排序紀錄。");if(confirm("確定還原排序前的行程順序？")){edits.dayOrders[k]=[...ids];queueCloudSave()}}
+window.renderSmartSortToolbar=(day,plan,items)=>`<div class="smart-sort-toolbar"><button id="sortByTime">依時間排序</button><button id="sortByRoute">智慧路線排序</button><button id="restoreOrder">還原排序</button><span>${items.filter(fixed).length} 個固定時間／釘選行程</span></div>`;
+window.bindSmartSortToolbar=(day,plan)=>{document.getElementById("sortByTime")?.addEventListener("click",()=>byTime(day,plan));document.getElementById("sortByRoute")?.addEventListener("click",()=>route(day,plan));document.getElementById("restoreOrder")?.addEventListener("click",()=>restore(day,plan))};
+})();
+
+/* V3.3 trip health */
+(function(){
+function t(v){const m=String(v||"").match(/^(\d{1,2}):(\d{2})$/);return m?+m[1]*60 + +m[2]:null}
+function issues(a){const x=[];if(a.length>=7)x.push(`共 ${a.length} 個行程，安排偏多，建議保留彈性。`);for(let i=0;i<a.length-1;i++){const A=t(a[i].time),B=t(a[i+1].time);if(A!==null&&B!==null){const gap=B-A,stay=Number(a[i].details?.recommendedStayMinutes)||60;if(gap>0&&gap<stay+20)x.push(`${a[i].time} ${a[i].title} 到 ${a[i+1].time} ${a[i+1].title} 間隔僅 ${gap} 分鐘。`)}}return x}
+window.renderTripHealth=(day,plan,a)=>{const x=issues(a);return `<section class="trip-health ${x.length?"has-warning":"is-good"}"><div><b>${x.length?"⚠ 行程健檢":"✓ 行程健檢"}</b><span>${x.length?`${x.length} 項提醒`:"目前未發現明顯時間衝突"}</span></div>${x.length?`<details><summary>查看提醒</summary><ul>${x.map(v=>`<li>${esc(v)}</li>`).join("")}</ul></details>`:""}</section>`};
+window.renderTodayReminder=()=>{const p=document.getElementById("todayReminderPanel"),b=document.getElementById("todayReminder");if(!p||!b||!trip)return;const n=dayFromToday(),day=n?trip.days.find(x=>x.day===n):trip.days[0];if(!day)return p.classList.add("hidden");const a=itemsForDay(day),w=weatherCache[day.date],notes=[n?`今天是 Day ${day.day}｜${day.title}`:`下一個旅程日：Day ${day.day}｜${day.title}`];if(day.planStatusOptions&&planStatusForDay(day)==="待確認成團")notes.push("⚠ 主方案尚未確認成團，請留意 KKday 通知並保留備案");if(w&&!w.wait){notes.push(`${w.icon} ${w.label}，${Math.round(w.min)}–${Math.round(w.max)}°C`);if(w.rain>=50)notes.push(`降雨機率 ${w.rain}%，建議攜帶雨具`);if(w.max>=32)notes.push("高溫，建議攜帶水、手持風扇並補擦防曬")}const s=a.map(x=>x.title).join(" ");if(/USJ|環球|柯南|Mario|Mine Cart/i.test(s))notes.push("確認 USJ 門票、Express Pass 與行動電源");if(/航班|BR17|機場|神姬巴士/i.test(s))notes.push("再次確認航班、巴士時間與護照");b.innerHTML=`<div class="today-reminder-list">${notes.map(x=>`<div>• ${esc(x)}</div>`).join("")}</div>`;p.classList.remove("hidden")};
+})();
+
 
 window.addEventListener("error", function(e){
   var boot=document.getElementById("boot");
@@ -41,12 +109,10 @@ let edits={
   hotelImage:"",
   hotelBooking:{},
   selectedDay6Plan:0,
-    day6PlanBEnabled:true,
   day6PlanBEnabled:true,
   dayOrders:{},
   prepItems:[],
   shopping:[],
-  shoppingSeedVersions:[],
   lastModified:null
 };
 
@@ -87,107 +153,46 @@ async function uploadImage(file,folder){
 
 
 
-const SHOPPING_SEED_VERSION="beauty-2026-08-07-v1";
-const SHOPPING_SEED=[
-  {
-    id:"seed-beauty-elixir-retinol",
-    name:"ELIXIR 視黃醇（Retino Power Wrinkle Cream ba S 15g）",
-    qty:1,
-    unitPrice:6600,
-    person:"自己",
-    done:false,
-    image:"./assets/products/elixir-retinol.webp",
-    referencePrice:true
-  },
-  {
-    id:"seed-beauty-biore-athlizm",
-    name:"Biore UV ATHLIZM 身體防曬 70g",
-    qty:1,
-    unitPrice:2000,
-    person:"自己",
-    done:false,
-    image:"./assets/products/biore-athlizm.jpg",
-    referencePrice:true
-  },
-  {
-    id:"seed-beauty-skin-aqua-gel",
-    name:"Skin Aqua UV Super Moisture Gel 110g",
-    qty:1,
-    unitPrice:1155,
-    person:"自己",
-    done:false,
-    image:"./assets/products/skin-aqua.jpg",
-    referencePrice:true
-  },
-  {
-    id:"seed-beauty-minon-mask",
-    name:"MINON ぷるぷるしっとり肌マスク 4片",
-    qty:1,
-    unitPrice:1320,
-    person:"自己",
-    done:false,
-    image:"./assets/products/minon-mask.png",
-    referencePrice:true
-  },
-  {
-    id:"seed-beauty-melano-cc-premium",
-    name:"Melano CC Premium 美白精華 20mL",
-    qty:1,
-    unitPrice:1359,
-    person:"自己",
-    done:false,
-    image:"./assets/products/melano-cc-premium.jpg",
-    referencePrice:true
-  },
-  {
-    id:"seed-beauty-lipopeel",
-    name:"LIPOPEEL 柔煥透亮精萃 30mL",
-    qty:1,
-    unitPrice:2480,
-    person:"自己",
-    done:false,
-    image:"./assets/products/lipopeel.webp",
-    referencePrice:true
-  },
-  {
-    id:"seed-beauty-fancl-mco",
-    name:"FANCL MCO 奈米淨化卸妝油 120mL",
-    qty:1,
-    unitPrice:1980,
-    person:"自己",
-    done:false,
-    image:"./assets/products/fancl-mco.webp",
-    referencePrice:true
-  }
+const BEAUTY_IMPORT_VERSION="beauty-products-2026-08-07-v4";
+const BEAUTY_IMPORT_ITEMS=[
+  {id:"beauty-elixir-retinol",name:"ELIXIR 視黃醇（Retino Power Wrinkle Cream ba S 15g）",qty:1,unitPrice:6600,person:"自己",done:false,image:"./assets/products/elixir-retinol.webp",referencePrice:true},
+  {id:"beauty-biore-athlizm",name:"Biore UV ATHLIZM 身體防曬 70g",qty:1,unitPrice:2000,person:"自己",done:false,image:"./assets/products/biore-athlizm.jpg",referencePrice:true},
+  {id:"beauty-skin-aqua-gel",name:"Skin Aqua UV Super Moisture Gel 110g",qty:1,unitPrice:1155,person:"自己",done:false,image:"./assets/products/skin-aqua.jpg",referencePrice:true},
+  {id:"beauty-minon-mask",name:"MINON 面膜 4片",qty:1,unitPrice:1320,person:"自己",done:false,image:"./assets/products/minon-mask.png",referencePrice:true},
+  {id:"beauty-melano-cc-premium",name:"Melano CC Premium 美白精華 20mL",qty:1,unitPrice:1359,person:"自己",done:false,image:"./assets/products/melano-cc-premium.jpg",referencePrice:true},
+  {id:"beauty-lipopeel",name:"LIPOPEEL 柔煥透亮精萃 30mL",qty:1,unitPrice:2480,person:"自己",done:false,image:"./assets/products/lipopeel.webp",referencePrice:true},
+  {id:"beauty-fancl-mco",name:"FANCL MCO 奈米淨化卸妝油 120mL",qty:1,unitPrice:1980,person:"自己",done:false,image:"./assets/products/fancl-mco.webp",referencePrice:true}
 ];
-
 function normalizedShoppingName(value){
   return String(value||"").toLowerCase().replace(/\s+/g,"").replace(/[（）()・／/]/g,"");
 }
-
-function appendShoppingSeed(){
+async function appendBeautyProducts(showMessage=false){
   edits.shopping=Array.isArray(edits.shopping)?edits.shopping:[];
-  edits.shoppingSeedVersions=Array.isArray(edits.shoppingSeedVersions)?edits.shoppingSeedVersions:[];
-
-  if(edits.shoppingSeedVersions.includes(SHOPPING_SEED_VERSION)){
-    return false;
+  edits.shoppingImports=Array.isArray(edits.shoppingImports)?edits.shoppingImports:[];
+  if(edits.shoppingImports.includes(BEAUTY_IMPORT_VERSION)){
+    if(showMessage)alert("7 項商品已在清單中。");
+    return 0;
   }
-
-  const existingIds=new Set(edits.shopping.map(item=>item.id).filter(Boolean));
-  const existingNames=new Set(edits.shopping.map(item=>normalizedShoppingName(item.name)));
-
-  for(const item of SHOPPING_SEED){
-    const sameName=existingNames.has(normalizedShoppingName(item.name));
-    if(!existingIds.has(item.id) && !sameName){
+  const ids=new Set(edits.shopping.map(x=>x.id).filter(Boolean));
+  const names=new Set(edits.shopping.map(x=>normalizedShoppingName(x.name)));
+  let added=0;
+  for(const item of BEAUTY_IMPORT_ITEMS){
+    if(!ids.has(item.id)&&!names.has(normalizedShoppingName(item.name))){
       edits.shopping.push({...item});
-      existingIds.add(item.id);
-      existingNames.add(normalizedShoppingName(item.name));
+      ids.add(item.id);
+      names.add(normalizedShoppingName(item.name));
+      added++;
     }
   }
-
-  edits.shoppingSeedVersions.push(SHOPPING_SEED_VERSION);
-  return true;
+  edits.shoppingImports.push(BEAUTY_IMPORT_VERSION);
+  persistLocal();
+  if(tripId&&editToken&&!readonly){
+    try{await saveCloud()}catch(e){console.error(e)}
+  }
+  if(showMessage)alert(added?`已新增 ${added} 項商品`:"7 項商品已在清單中。");
+  return added;
 }
+window.appendBeautyProducts=appendBeautyProducts;
 
 function migrateEdits(raw){
   const previous=raw&&typeof raw==="object"?raw:{};
@@ -196,7 +201,7 @@ function migrateEdits(raw){
     localStorage.setItem(key,JSON.stringify(previous));
   }catch{}
   const defaults={
-    version:4,
+    version:6,
     itemOverrides:{},
     hiddenItems:[],
     addedItems:[],
@@ -220,7 +225,7 @@ function migrateEdits(raw){
       {id:"prep-cash",name:"日圓現金",done:false}
     ],
     shopping:[],
-    shoppingSeedVersions:[],
+    shoppingImports:[],
     lastModified:null
   };
   const next={...defaults,...previous};
@@ -237,8 +242,8 @@ function migrateEdits(raw){
   next.addedItems=Array.isArray(previous.addedItems)?previous.addedItems:[];
   next.prepItems=Array.isArray(previous.prepItems)&&previous.prepItems.length?previous.prepItems:defaults.prepItems;
   next.shopping=Array.isArray(previous.shopping)?previous.shopping:[];
-  next.shoppingSeedVersions=Array.isArray(previous.shoppingSeedVersions)?previous.shoppingSeedVersions:[];
-  next.version=5;
+  next.shoppingImports=Array.isArray(previous.shoppingImports)?previous.shoppingImports:[];
+  next.version=6;
   return next;
 }
 
@@ -635,11 +640,7 @@ async function init(){
     trip=applyDayOverrides(trip,dayOverrides);
     loadLocalEdits();
     if(tripId&&activeToken()){try{await fetchCloud();setSync("雲端已連線")}catch(e){console.error(e);setSync("雲端讀取失敗，顯示本機資料")}}
-    const shoppingSeedAdded=appendShoppingSeed();
-    if(shoppingSeedAdded){
-      persistLocal();
-      if(tripId&&editToken&&!readonly)await saveCloud();
-    }
+    await appendBeautyProducts(false);
     $("#boot").classList.add("hidden");$("#app").classList.remove("hidden");renderAll();loadAllWeather();
     if(tripId&&activeToken())setInterval(async()=>{if(document.hidden)return;try{const before=JSON.stringify(edits);await fetchCloud();if(JSON.stringify(edits)!==before){renderAll();setSync("已收到其他裝置更新")}}catch{}},7000);
   }catch(e){$("#boot").innerHTML=`<div style="padding:24px;text-align:center"><b>資料載入失敗</b><p>${esc(e.message)}</p></div>`}
@@ -657,5 +658,5 @@ $("#exportState").onclick=()=>{const a=document.createElement("a");a.href=URL.cr
 $("#importState").onchange=e=>{const r=new FileReader();r.onload=()=>{try{edits={...edits,...JSON.parse(r.result)};queueCloudSave()}catch{alert("檔案格式錯誤")}};r.readAsText(e.target.files[0])};
 $("#clearEdits").onclick=()=>{if(confirm("清除所有個人修改？原始行程仍會保留。")){const share=edits.shareToken;edits=migrateEdits({shareToken:share});queueCloudSave()}};
 
-$("#addPrepItem").onclick=addPrep;$("#addShopping").onclick=addShopping;
+$("#addPrepItem").onclick=addPrep;$("#addShopping").onclick=addShopping;$("#appendBeautyProducts").onclick=()=>appendBeautyProducts(true);
 init();

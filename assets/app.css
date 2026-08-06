@@ -106,5 +106,4 @@ menu{display:flex;justify-content:flex-end;gap:8px;padding:12px 0 0;margin:0}
 }
 
 .shopping-header-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
-#beautyImportStatus{display:block;margin-top:3px;color:var(--green);font-weight:900}
 @media(max-width:520px){.shopping-header-actions{width:100%;justify-content:flex-start}.shopping-header-actions button{flex:1}}
