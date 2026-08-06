@@ -51,6 +51,17 @@ let edits={
 
 const headers={"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"};
 const cityCoords={Osaka:{lat:34.6937,lon:135.5023,label:"大阪"},Kyoto:{lat:35.0116,lon:135.7681,label:"京都"},Kobe:{lat:34.6901,lon:135.1955,label:"神戶"}};
+
+const RECOMMENDED_SHOPPING_ITEMS=[
+  {id:"shop-rec-elixir",name:"ELIXIR Retino Power Wrinkle Cream ba S 15g",qty:1,unitPrice:6600,person:"自己",done:false,image:"assets/products/elixir.webp"},
+  {id:"shop-rec-biore-athlizm",name:"Biore UV ATHLIZM Protect Mist 70ml",qty:1,unitPrice:1980,person:"自己",done:false,image:"https://japanesetaste.com.au/cdn/shop/files/athlizm_1.jpg?v=1746157315"},
+  {id:"shop-rec-skin-aqua",name:"Skin Aqua Super Moisture UV Gel Pump 140g",qty:1,unitPrice:1375,person:"自己",done:false,image:"assets/products/skin-aqua.jpg"},
+  {id:"shop-rec-minon-mask",name:"MINON Amino Moist 保濕面膜 4片",qty:1,unitPrice:1320,person:"自己",done:false,image:"assets/products/minon.jpg"},
+  {id:"shop-rec-melano-cc",name:"Melano CC Premium Essence 20ml",qty:1,unitPrice:1628,person:"自己",done:false,image:"assets/products/melano-cc.jpg"},
+  {id:"shop-rec-lipopeel",name:"LIPOPEEL 柔煥透亮精萃 30ml",qty:1,unitPrice:2480,person:"自己",done:false,image:"assets/products/lipopeel.png"},
+  {id:"shop-rec-fancl-mco",name:"FANCL Mild Cleansing Oil 120ml",qty:1,unitPrice:1980,person:"自己",done:false,image:"assets/products/fancl-mco.png"}
+];
+
 const weatherCodes={0:["☀️","晴朗"],1:["🌤️","大致晴朗"],2:["⛅","局部多雲"],3:["☁️","陰天"],45:["🌫️","有霧"],48:["🌫️","霧淞"],51:["🌦️","毛毛雨"],53:["🌦️","毛毛雨"],55:["🌧️","較強毛毛雨"],61:["🌧️","小雨"],63:["🌧️","中雨"],65:["🌧️","大雨"],80:["🌦️","陣雨"],81:["🌧️","陣雨"],82:["⛈️","強陣雨"],95:["⛈️","雷雨"],96:["⛈️","雷雨冰雹"],99:["⛈️","強雷雨冰雹"]};
 
 function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
@@ -132,6 +143,13 @@ function migrateEdits(raw){
   next.addedItems=Array.isArray(previous.addedItems)?previous.addedItems:[];
   next.prepItems=Array.isArray(previous.prepItems)&&previous.prepItems.length?previous.prepItems:defaults.prepItems;
   next.shopping=Array.isArray(previous.shopping)?previous.shopping:[];
+  const normalizedNames=new Set(next.shopping.map(x=>String(x.name||"").toLowerCase().replace(/\s+/g,"")));
+  RECOMMENDED_SHOPPING_ITEMS.forEach(item=>{
+    const key=String(item.name).toLowerCase().replace(/\s+/g,"");
+    const idExists=next.shopping.some(x=>x.id===item.id);
+    const fuzzyExists=["elixir","athlizm","skinaqua","minon","melanocc","lipopeel","fancl"].some(token=>key.includes(token)&&[...normalizedNames].some(n=>n.includes(token)));
+    if(!idExists&&!normalizedNames.has(key)&&!fuzzyExists){next.shopping.push({...item});normalizedNames.add(key)}
+  });
   next.version=5;
   return next;
 }
