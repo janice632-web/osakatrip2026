@@ -1,18 +1,26 @@
-V3.4.1 Day 6 Plan B 開關
+V3.4.2 必買／代購商品附加更新
 
-只需覆蓋：
+覆蓋／新增：
 - assets/app.js
-- assets/app.css
+- assets/products/（7 張商品照片）
 - index.html
 - service-worker.js
 
-功能：
-- Day 6 顯示「啟用 Plan B 神戶半日遊」開關
-- 開啟：顯示 Plan A／Plan B 切換
-- 關閉：隱藏 Plan B，只保留 Plan A
-- Plan A／Plan B 各自排序與資料保留
-- 開關狀態保存至本機與 Supabase
-- Day 1～Day 5 完全不修改
+不要覆蓋：
+- public/data/
+- assets/app.css
+- assets/smart-route.js
+- assets/trip-health.js
+- icons/
+- SUPABASE_SETUP.sql
+
+資料保護：
+- 不修改任何行程資料
+- 不重建既有必買／代購清單
+- 只在這批商品尚未匯入時附加 7 項
+- 使用固定批次標記避免重複新增
+- 新增後同步至 Supabase
+- 商品日後若由使用者刪除，不會在重新整理時自動加回
 
 Commit：
-V3.4.1 Day6 Plan B toggle
+V3.4.2 append beauty shopping products

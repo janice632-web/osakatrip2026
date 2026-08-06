@@ -1,4 +1,4 @@
-const CACHE_NAME = 'travel-companion-v3-4-2-shopping-photos';
+const CACHE_NAME = 'travel-companion-v3-4-2-shopping1';
 const APP_SHELL = [
   './',
   './index.html',
@@ -14,12 +14,13 @@ const APP_SHELL = [
   './public/data/luggage.json',
   './public/data/tickets.json',
   './public/data/wishlist.json',
-  './assets/products/elixir.webp',
+  './assets/products/elixir-retinol.webp',
+  './assets/products/biore-athlizm.jpg',
   './assets/products/skin-aqua.jpg',
-  './assets/products/minon.jpg',
-  './assets/products/melano-cc.jpg',
-  './assets/products/lipopeel.png',
-  './assets/products/fancl-mco.png'
+  './assets/products/minon-mask.png',
+  './assets/products/melano-cc-premium.jpg',
+  './assets/products/lipopeel.webp',
+  './assets/products/fancl-mco.webp'
 ];
 
 self.addEventListener('install', event => {

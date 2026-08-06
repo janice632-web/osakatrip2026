@@ -46,22 +46,12 @@ let edits={
   dayOrders:{},
   prepItems:[],
   shopping:[],
+  shoppingSeedVersions:[],
   lastModified:null
 };
 
 const headers={"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"};
 const cityCoords={Osaka:{lat:34.6937,lon:135.5023,label:"大阪"},Kyoto:{lat:35.0116,lon:135.7681,label:"京都"},Kobe:{lat:34.6901,lon:135.1955,label:"神戶"}};
-
-const RECOMMENDED_SHOPPING_ITEMS=[
-  {id:"shop-rec-elixir",name:"ELIXIR Retino Power Wrinkle Cream ba S 15g",qty:1,unitPrice:6600,person:"自己",done:false,image:"assets/products/elixir.webp"},
-  {id:"shop-rec-biore-athlizm",name:"Biore UV ATHLIZM Protect Mist 70ml",qty:1,unitPrice:1980,person:"自己",done:false,image:"https://japanesetaste.com.au/cdn/shop/files/athlizm_1.jpg?v=1746157315"},
-  {id:"shop-rec-skin-aqua",name:"Skin Aqua Super Moisture UV Gel Pump 140g",qty:1,unitPrice:1375,person:"自己",done:false,image:"assets/products/skin-aqua.jpg"},
-  {id:"shop-rec-minon-mask",name:"MINON Amino Moist 保濕面膜 4片",qty:1,unitPrice:1320,person:"自己",done:false,image:"assets/products/minon.jpg"},
-  {id:"shop-rec-melano-cc",name:"Melano CC Premium Essence 20ml",qty:1,unitPrice:1628,person:"自己",done:false,image:"assets/products/melano-cc.jpg"},
-  {id:"shop-rec-lipopeel",name:"LIPOPEEL 柔煥透亮精萃 30ml",qty:1,unitPrice:2480,person:"自己",done:false,image:"assets/products/lipopeel.png"},
-  {id:"shop-rec-fancl-mco",name:"FANCL Mild Cleansing Oil 120ml",qty:1,unitPrice:1980,person:"自己",done:false,image:"assets/products/fancl-mco.png"}
-];
-
 const weatherCodes={0:["☀️","晴朗"],1:["🌤️","大致晴朗"],2:["⛅","局部多雲"],3:["☁️","陰天"],45:["🌫️","有霧"],48:["🌫️","霧淞"],51:["🌦️","毛毛雨"],53:["🌦️","毛毛雨"],55:["🌧️","較強毛毛雨"],61:["🌧️","小雨"],63:["🌧️","中雨"],65:["🌧️","大雨"],80:["🌦️","陣雨"],81:["🌧️","陣雨"],82:["⛈️","強陣雨"],95:["⛈️","雷雨"],96:["⛈️","雷雨冰雹"],99:["⛈️","強雷雨冰雹"]};
 
 function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
@@ -96,6 +86,109 @@ async function uploadImage(file,folder){
 }
 
 
+
+const SHOPPING_SEED_VERSION="beauty-2026-08-07-v1";
+const SHOPPING_SEED=[
+  {
+    id:"seed-beauty-elixir-retinol",
+    name:"ELIXIR 視黃醇（Retino Power Wrinkle Cream ba S 15g）",
+    qty:1,
+    unitPrice:6600,
+    person:"自己",
+    done:false,
+    image:"./assets/products/elixir-retinol.webp",
+    referencePrice:true
+  },
+  {
+    id:"seed-beauty-biore-athlizm",
+    name:"Biore UV ATHLIZM 身體防曬 70g",
+    qty:1,
+    unitPrice:2000,
+    person:"自己",
+    done:false,
+    image:"./assets/products/biore-athlizm.jpg",
+    referencePrice:true
+  },
+  {
+    id:"seed-beauty-skin-aqua-gel",
+    name:"Skin Aqua UV Super Moisture Gel 110g",
+    qty:1,
+    unitPrice:1155,
+    person:"自己",
+    done:false,
+    image:"./assets/products/skin-aqua.jpg",
+    referencePrice:true
+  },
+  {
+    id:"seed-beauty-minon-mask",
+    name:"MINON ぷるぷるしっとり肌マスク 4片",
+    qty:1,
+    unitPrice:1320,
+    person:"自己",
+    done:false,
+    image:"./assets/products/minon-mask.png",
+    referencePrice:true
+  },
+  {
+    id:"seed-beauty-melano-cc-premium",
+    name:"Melano CC Premium 美白精華 20mL",
+    qty:1,
+    unitPrice:1359,
+    person:"自己",
+    done:false,
+    image:"./assets/products/melano-cc-premium.jpg",
+    referencePrice:true
+  },
+  {
+    id:"seed-beauty-lipopeel",
+    name:"LIPOPEEL 柔煥透亮精萃 30mL",
+    qty:1,
+    unitPrice:2480,
+    person:"自己",
+    done:false,
+    image:"./assets/products/lipopeel.webp",
+    referencePrice:true
+  },
+  {
+    id:"seed-beauty-fancl-mco",
+    name:"FANCL MCO 奈米淨化卸妝油 120mL",
+    qty:1,
+    unitPrice:1980,
+    person:"自己",
+    done:false,
+    image:"./assets/products/fancl-mco.webp",
+    referencePrice:true
+  }
+];
+
+function normalizedShoppingName(value){
+  return String(value||"").toLowerCase().replace(/\s+/g,"").replace(/[（）()・／/]/g,"");
+}
+
+function appendShoppingSeed(){
+  edits.shopping=Array.isArray(edits.shopping)?edits.shopping:[];
+  edits.shoppingSeedVersions=Array.isArray(edits.shoppingSeedVersions)?edits.shoppingSeedVersions:[];
+
+  if(edits.shoppingSeedVersions.includes(SHOPPING_SEED_VERSION)){
+    return false;
+  }
+
+  const existingIds=new Set(edits.shopping.map(item=>item.id).filter(Boolean));
+  const existingNames=new Set(edits.shopping.map(item=>normalizedShoppingName(item.name)));
+
+  for(const item of SHOPPING_SEED){
+    const sameName=existingNames.has(normalizedShoppingName(item.name));
+    if(!existingIds.has(item.id) && !sameName){
+      edits.shopping.push({...item});
+      existingIds.add(item.id);
+      existingNames.add(normalizedShoppingName(item.name));
+    }
+  }
+
+  edits.shoppingSeedVersions.push(SHOPPING_SEED_VERSION);
+  return true;
+}
+
 function migrateEdits(raw){
   const previous=raw&&typeof raw==="object"?raw:{};
   try{
@@ -127,6 +220,7 @@ function migrateEdits(raw){
       {id:"prep-cash",name:"日圓現金",done:false}
     ],
     shopping:[],
+    shoppingSeedVersions:[],
     lastModified:null
   };
   const next={...defaults,...previous};
@@ -143,13 +237,7 @@ function migrateEdits(raw){
   next.addedItems=Array.isArray(previous.addedItems)?previous.addedItems:[];
   next.prepItems=Array.isArray(previous.prepItems)&&previous.prepItems.length?previous.prepItems:defaults.prepItems;
   next.shopping=Array.isArray(previous.shopping)?previous.shopping:[];
-  const normalizedNames=new Set(next.shopping.map(x=>String(x.name||"").toLowerCase().replace(/\s+/g,"")));
-  RECOMMENDED_SHOPPING_ITEMS.forEach(item=>{
-    const key=String(item.name).toLowerCase().replace(/\s+/g,"");
-    const idExists=next.shopping.some(x=>x.id===item.id);
-    const fuzzyExists=["elixir","athlizm","skinaqua","minon","melanocc","lipopeel","fancl"].some(token=>key.includes(token)&&[...normalizedNames].some(n=>n.includes(token)));
-    if(!idExists&&!normalizedNames.has(key)&&!fuzzyExists){next.shopping.push({...item});normalizedNames.add(key)}
-  });
+  next.shoppingSeedVersions=Array.isArray(previous.shoppingSeedVersions)?previous.shoppingSeedVersions:[];
   next.version=5;
   return next;
 }
@@ -498,7 +586,7 @@ function renderShopping(){
   $("#personSummary").innerHTML=Object.entries(people).map(([p,v])=>`<div class="person-chip"><span>${esc(p)}</span><b>¥${v.toLocaleString()}</b></div>`).join("");
   $("#shoppingList").innerHTML=edits.shopping.map(x=>`<article class="shopping-card ${x.done?"done":""}">
     ${x.image?`<img src="${x.image}" alt="" loading="lazy">`:'<div class="photo-placeholder">無照片</div>'}
-    <div class="shopping-body"><h4>${esc(x.name)}</h4><p>${Number(x.qty)||0} × ¥${Number(x.unitPrice||0).toLocaleString()}＝¥${shoppingAmount(x).toLocaleString()}</p><p>委託人：${esc(x.person||"自己")}</p></div>
+    <div class="shopping-body"><h4>${esc(x.name)}</h4><p>${x.referencePrice?"日本參考價 ":""}¥${Number(x.unitPrice||0).toLocaleString()}${Number(x.qty||0)!==1?` × ${Number(x.qty)||0}＝¥${shoppingAmount(x).toLocaleString()}`:""}</p><p>委託人：${esc(x.person||"自己")}</p></div>
     <div class="tool-actions"><button onclick="toggleShopping('${x.id}')">✓</button><button onclick="editShopping('${x.id}')">編輯</button><button onclick="shoppingPhoto('${x.id}')">照片</button><button onclick="deleteShopping('${x.id}')">刪除</button></div>
   </article>`).join("")||'<div class="today-empty">尚無必買／代購項目。</div>';
 }
@@ -547,6 +635,11 @@ async function init(){
     trip=applyDayOverrides(trip,dayOverrides);
     loadLocalEdits();
     if(tripId&&activeToken()){try{await fetchCloud();setSync("雲端已連線")}catch(e){console.error(e);setSync("雲端讀取失敗，顯示本機資料")}}
+    const shoppingSeedAdded=appendShoppingSeed();
+    if(shoppingSeedAdded){
+      persistLocal();
+      if(tripId&&editToken&&!readonly)await saveCloud();
+    }
     $("#boot").classList.add("hidden");$("#app").classList.remove("hidden");renderAll();loadAllWeather();
     if(tripId&&activeToken())setInterval(async()=>{if(document.hidden)return;try{const before=JSON.stringify(edits);await fetchCloud();if(JSON.stringify(edits)!==before){renderAll();setSync("已收到其他裝置更新")}}catch{}},7000);
   }catch(e){$("#boot").innerHTML=`<div style="padding:24px;text-align:center"><b>資料載入失敗</b><p>${esc(e.message)}</p></div>`}
