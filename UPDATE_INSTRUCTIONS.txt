@@ -1,26 +1,22 @@
-V3.4.2 必買／代購商品附加更新
+V3.4.3 必買商品匯入修正
 
 覆蓋／新增：
-- assets/app.js
-- assets/products/（7 張商品照片）
+- assets/app.v343.shopping.js（新增）
+- assets/app.css
+- assets/products/
 - index.html
 - service-worker.js
 
-不要覆蓋：
-- public/data/
-- assets/app.css
-- assets/smart-route.js
-- assets/trip-health.js
-- icons/
-- SUPABASE_SETUP.sql
+更新後進入「工具 → 必買／代購」：
+- 正常情況會自動新增
+- 若沒有出現，按「匯入 7 項商品」
+- 畫面會顯示新增數量或已存在
 
-資料保護：
-- 不修改任何行程資料
-- 不重建既有必買／代購清單
-- 只在這批商品尚未匯入時附加 7 項
-- 使用固定批次標記避免重複新增
-- 新增後同步至 Supabase
-- 商品日後若由使用者刪除，不會在重新整理時自動加回
+不修改：
+- public/data/
+- 行程
+- 住宿
+- 既有必買／代購資料
 
 Commit：
-V3.4.2 append beauty shopping products
+V3.4.3 shopping import fix

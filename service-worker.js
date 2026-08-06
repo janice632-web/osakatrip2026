@@ -1,9 +1,9 @@
-const CACHE_NAME = 'travel-companion-v3-4-2-shopping1';
+const CACHE_NAME = 'travel-companion-v3-4-3-shopping-import1';
 const APP_SHELL = [
   './',
   './index.html',
   './assets/app.css',
-  './assets/app.js?v=300',
+  './assets/app.v343.shopping.js?v=343-import1',
   './manifest.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png',
