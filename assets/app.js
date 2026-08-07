@@ -701,6 +701,37 @@ window.togglePrep=id=>{const x=edits.prepItems.find(v=>v.id===id);x.done=!x.done
 window.deletePrep=id=>{edits.prepItems=edits.prepItems.filter(x=>x.id!==id);queueCloudSave()};
 function addPrep(){openEditor("新增行前準備",[{name:"name",label:"項目",type:"text",value:""}],v=>{edits.prepItems.push({id:"prep-"+crypto.randomUUID(),name:v.name,done:false});queueCloudSave()})}
 
+
+function openImageLightbox(src,caption=""){
+  if(!src)return;
+  const box=$("#imageLightbox");
+  const img=$("#imageLightboxImg");
+  const label=$("#imageLightboxCaption");
+  img.src=src;
+  img.alt=caption?`${caption} 商品圖片`:"商品圖片放大預覽";
+  label.textContent=caption||"";
+  box.classList.remove("hidden");
+  document.body.classList.add("lightbox-open");
+}
+function closeImageLightbox(){
+  const box=$("#imageLightbox");
+  if(!box)return;
+  box.classList.add("hidden");
+  $("#imageLightboxImg").removeAttribute("src");
+  document.body.classList.remove("lightbox-open");
+}
+function bindImageLightbox(){
+  $$(".shopping-zoom-image").forEach(img=>{
+    img.onclick=()=>openImageLightbox(img.src,img.dataset.caption||img.alt||"");
+    img.onkeydown=e=>{
+      if(e.key==="Enter"||e.key===" "){
+        e.preventDefault();
+        openImageLightbox(img.src,img.dataset.caption||img.alt||"");
+      }
+    };
+  });
+}
+
 let shoppingView="all";
 let shoppingPerson="";
 let shoppingSearchText="";
@@ -807,7 +838,7 @@ function renderProductGroupCard(group){
   });
   return `<details class="product-group-card">
     <summary>
-      ${group.image?`<img src="${group.image}" loading="lazy" alt="">`:'<div class="photo-placeholder">無照片</div>'}
+      ${group.image?`<img class="shopping-zoom-image" src="${group.image}" loading="lazy" alt="${esc(group.name)}" data-caption="${esc(group.name)}" role="button" tabindex="0" title="點擊放大">`:'<div class="photo-placeholder">無照片</div>'}
       <div class="product-group-main">
         <h4>${esc(group.name)}</h4>
         <p>總數量：${group.totalQty}｜預估總額：¥${group.totalAmount.toLocaleString()}</p>
@@ -840,11 +871,12 @@ function renderShopping(){
     $("#shoppingList").innerHTML=groups.length
       ? groups.map(renderProductGroupCard).join("")
       : '<div class="today-empty">找不到符合條件的商品。</div>';
+    bindImageLightbox();
     return;
   }
 
   $("#shoppingList").innerHTML=filtered.map(x=>`<article class="shopping-card ${x.done?"done":""}">
-    ${x.image?`<img src="${x.image}" alt="" loading="lazy">`:'<div class="photo-placeholder">無照片</div>'}
+    ${x.image?`<img class="shopping-zoom-image" src="${x.image}" alt="${esc(x.name)}" data-caption="${esc(x.name)}" loading="lazy" role="button" tabindex="0" title="點擊放大">`:'<div class="photo-placeholder">無照片</div>'}
     <div class="shopping-body">
       <h4>${esc(x.name)}</h4>
       <p>${x.referencePrice?"日本參考價 ":""}¥${Number(x.unitPrice||0).toLocaleString()}${Number(x.qty||0)!==1?` × ${Number(x.qty)||0}＝¥${shoppingAmount(x).toLocaleString()}`:""}</p>
@@ -857,6 +889,7 @@ function renderShopping(){
       <button onclick="deleteShopping('${x.id}')">刪除</button>
     </div>
   </article>`).join("")||'<div class="today-empty">找不到符合條件的商品。</div>';
+  bindImageLightbox();
 }
 window.toggleShopping=id=>{const x=edits.shopping.find(v=>v.id===id);x.done=!x.done;queueCloudSave()};
 window.deleteShopping=id=>{if(confirm("刪除此項目？")){edits.shopping=edits.shopping.filter(x=>x.id!==id);queueCloudSave()}};
@@ -944,6 +977,9 @@ $("#exportState").onclick=()=>{const a=document.createElement("a");a.href=URL.cr
 $("#importState").onchange=e=>{const r=new FileReader();r.onload=()=>{try{edits={...edits,...JSON.parse(r.result)};queueCloudSave()}catch{alert("檔案格式錯誤")}};r.readAsText(e.target.files[0])};
 $("#clearEdits").onclick=()=>{if(confirm("清除所有個人修改？原始行程仍會保留。")){const share=edits.shareToken;edits=migrateEdits({shareToken:share});queueCloudSave()}};
 
+$("#closeImageLightbox").onclick=closeImageLightbox;
+$("#imageLightbox").onclick=e=>{if(e.target===$("#imageLightbox"))closeImageLightbox()};
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#imageLightbox").classList.contains("hidden"))closeImageLightbox()});
 $("#addPrepItem").onclick=addPrep;$("#addShopping").onclick=addShopping;$("#appendBeautyProducts").onclick=()=>appendBeautyProducts(true);$("#installApp").onclick=installTravelApp;
 
 $("#shoppingSearch").oninput=e=>{

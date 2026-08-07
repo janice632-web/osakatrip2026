@@ -11,7 +11,7 @@
   <link rel="manifest" href="./manifest.webmanifest?v=410-phase3">
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
-  <link rel="stylesheet" href="./assets/app.css?v=420-shopping1">
+  <link rel="stylesheet" href="./assets/app.css?v=421-lightbox1">
 </head>
 <body>
   <div id="boot" class="boot">正在讀取 Osaka 2026…</div>
@@ -20,7 +20,7 @@
     <header class="hero">
       <div class="hero-shade"></div>
       <div class="hero-inner">
-        <div class="eyebrow">TRAVEL COMPANION V4.2.0</div>
+        <div class="eyebrow">TRAVEL COMPANION V4.2.1</div>
         <h1>OSAKA 2026<br><span>Janice’s Journey</span></h1>
         <p id="tripDates">2026.08.12—08.17｜6天5夜</p>
 
@@ -220,7 +220,16 @@
         </section>
       </section>
 
-    </main>
+    
+  <div id="imageLightbox" class="image-lightbox hidden" role="dialog" aria-modal="true" aria-label="商品圖片預覽">
+    <button id="closeImageLightbox" class="image-lightbox-close" aria-label="關閉圖片">×</button>
+    <div class="image-lightbox-stage">
+      <img id="imageLightboxImg" alt="商品圖片放大預覽">
+      <div id="imageLightboxCaption" class="image-lightbox-caption"></div>
+    </div>
+  </div>
+
+</main>
 
     <nav id="bottomNav" class="bottom-nav"></nav>
   </div>
@@ -239,6 +248,6 @@
       </menu>
     </form>
   </dialog>
-<script defer src="./assets/app.js?v=420-shopping1"></script>
+<script defer src="./assets/app.js?v=421-lightbox1"></script>
 </body>
 </html>

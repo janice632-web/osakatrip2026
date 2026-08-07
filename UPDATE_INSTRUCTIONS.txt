@@ -1,28 +1,23 @@
-V4.2.0 必買／代購中心
+V4.2.1 商品圖片放大
 
 覆蓋／新增：
 - assets/app.js
 - assets/app.css
 - index.html
 - README.md
-- V4_2_VALIDATION.json
+- V4_2_1_VALIDATION.json
 
 不要動：
 - public/data/
 - assets/products/
-- icons/
 - manifest.webmanifest
 - service-worker.js
+- icons/
 - SUPABASE_SETUP.sql
 
-功能：
-- 全部／依人／依商品
-- 點人名篩選
-- 每人件數、商品數、總金額
-- 同商品多人購買統計
-- 點商品展開購買人
-- 商品搜尋
-- 名稱／價格／新增時間排序
+操作：
+- 點商品圖片 → 放大
+- 點背景／右上角 ×／Esc → 關閉
 
 Commit：
-V4.2.0 shopping center
+V4.2.1 shopping image lightbox

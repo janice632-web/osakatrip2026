@@ -1,0 +1,22 @@
+{
+  "version": "4.2.1",
+  "javascript_syntax": "PASS",
+  "public_data_unchanged": true,
+  "shopping_image_lightbox": true,
+  "close_methods": [
+    "close_button",
+    "background",
+    "Escape"
+  ],
+  "mobile_supported": true,
+  "public_data_files": {
+    "hotel.json": true,
+    "luggage.json": true,
+    "transport.json": true,
+    "shopping.json": true,
+    "day-overrides.json": true,
+    "tickets.json": true,
+    "osaka-2026.json": true,
+    "wishlist.json": true
+  }
+}
