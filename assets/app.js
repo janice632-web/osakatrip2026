@@ -153,6 +153,97 @@ async function uploadImage(file,folder){
 
 
 
+
+const APP_VERSION="4.1.0";
+let deferredInstallPrompt=null;
+let swRegistration=null;
+let swReloading=false;
+
+function isStandaloneMode(){
+  return window.matchMedia?.("(display-mode: standalone)")?.matches || window.navigator.standalone===true;
+}
+function isIOS(){
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+function updateInstallUI(){
+  const panel=document.getElementById("installPanel");
+  const button=document.getElementById("installApp");
+  const hint=document.getElementById("installHint");
+  if(!panel||!button||!hint)return;
+  if(isStandaloneMode()){
+    button.textContent="已加入主畫面";
+    button.disabled=true;
+    hint.textContent="目前正以主畫面 App 模式開啟。";
+    return;
+  }
+  button.disabled=false;
+  button.textContent="加入主畫面";
+  hint.textContent=isIOS()
+    ?"iPhone／iPad：Safari 點「分享」→「加入主畫面」。"
+    :"可將旅遊手冊安裝到主畫面，離線時仍可查看已載入資料。";
+}
+async function installTravelApp(){
+  if(isStandaloneMode())return;
+  if(deferredInstallPrompt){
+    deferredInstallPrompt.prompt();
+    try{await deferredInstallPrompt.userChoice}catch{}
+    deferredInstallPrompt=null;
+    updateInstallUI();
+    return;
+  }
+  if(isIOS()){
+    alert("iPhone／iPad 安裝方式：\n\n1. 請使用 Safari 開啟此網站\n2. 點下方「分享」圖示\n3. 往下選「加入主畫面」\n4. 點右上角「新增」");
+    return;
+  }
+  alert("若瀏覽器沒有顯示安裝提示，請從瀏覽器選單選擇「安裝應用程式」或「加入主畫面」。");
+}
+async function registerServiceWorker(){
+  if(!("serviceWorker" in navigator))return;
+  try{
+    swRegistration=await navigator.serviceWorker.register("./service-worker.js?v=410-phase3",{updateViaCache:"none"});
+    await swRegistration.update().catch(()=>{});
+    swRegistration.addEventListener("updatefound",()=>{
+      const worker=swRegistration.installing;
+      if(!worker)return;
+      worker.addEventListener("statechange",()=>{
+        if(worker.state==="installed" && navigator.serviceWorker.controller){
+          worker.postMessage({type:"SKIP_WAITING"});
+        }
+      });
+    });
+    navigator.serviceWorker.addEventListener("controllerchange",()=>{
+      if(swReloading)return;
+      swReloading=true;
+      sessionStorage.setItem("tc-sw-version",APP_VERSION);
+      location.reload();
+    });
+    window.addEventListener("focus",()=>swRegistration?.update().catch(()=>{}));
+  }catch(e){
+    console.warn("Service Worker registration failed",e);
+  }
+}
+window.addEventListener("beforeinstallprompt",e=>{
+  e.preventDefault();
+  deferredInstallPrompt=e;
+  updateInstallUI();
+});
+window.addEventListener("appinstalled",()=>{
+  deferredInstallPrompt=null;
+  updateInstallUI();
+});
+window.addEventListener("online",()=>setConnectionState(true));
+window.addEventListener("offline",()=>setConnectionState(false));
+
+function setConnectionState(online=navigator.onLine){
+  document.documentElement.dataset.connection=online?"online":"offline";
+  if(!online){
+    setSync("離線模式｜修改已保存本機");
+  }else if(tripId&&activeToken()){
+    setSync("已恢復連線，正在同步…");
+    reconcileCloudState().catch(()=>setSync("已連線｜等待下次同步"));
+  }
+}
+
 const BEAUTY_IMPORT_VERSION="beauty-products-2026-08-07-v4";
 const BEAUTY_IMPORT_ITEMS=[
   {id:"beauty-elixir-retinol",name:"ELIXIR 視黃醇（Retino Power Wrinkle Cream ba S 15g）",qty:1,unitPrice:6600,person:"自己",done:false,image:"./assets/products/elixir-retinol.webp",referencePrice:true},
@@ -261,20 +352,46 @@ function queueCloudSave(){
 }
 async function saveCloud(){
   if(readonly||!tripId||!editToken)return;
+  if(!navigator.onLine){
+    setSync("離線模式｜修改已保存本機");
+    return;
+  }
   setSync("同步中…");
   try{
     lastCloudUpdated=await rpc("tc_update_private_trip",{p_trip_id:tripId,p_edit_token:editToken,p_payload:edits});
     setSync("已同步 "+dateTimeText());
-  }catch(e){setSync("同步失敗，已保存本機");console.error(e)}
+  }catch(e){
+    setSync("同步失敗，已保存本機");
+    console.error(e);
+  }
 }
 async function fetchCloud(){
+  if(!navigator.onLine)throw new Error("offline");
   const rows=await rpc("tc_get_private_trip",{p_trip_id:tripId,p_token:activeToken()});
   if(!rows?.length)throw new Error("私人連結無效或旅程不存在");
   readonly=!rows[0].can_edit;
-  const cloud=rows[0].payload||{};
-  const cloudTime=Date.parse(cloud.lastModified||0),localTime=Date.parse(edits.lastModified||0);
-  if(cloudTime>=localTime)edits=migrateEdits({...edits,...cloud});
-  persistLocal();lastCloudUpdated=rows[0].updated_at;
+  const cloud=migrateEdits(rows[0].payload||{});
+  const cloudTime=Date.parse(cloud.lastModified||0);
+  const localTime=Date.parse(edits.lastModified||0);
+  if(cloudTime>localTime){
+    edits=migrateEdits({...edits,...cloud});
+    localStorage.setItem(localKey(),JSON.stringify(edits));
+  }
+  lastCloudUpdated=rows[0].updated_at;
+  return {cloudTime,localTime,canEdit:rows[0].can_edit};
+}
+async function reconcileCloudState(){
+  if(!tripId||!activeToken()||!navigator.onLine)return;
+  const before=JSON.stringify(edits);
+  const result=await fetchCloud();
+  if(result.localTime>result.cloudTime && editToken && !readonly){
+    await saveCloud();
+  }else if(JSON.stringify(edits)!==before){
+    renderAll();
+    setSync("已收到其他裝置更新");
+  }else{
+    setSync("已同步 "+dateTimeText());
+  }
 }
 async function createCloudTrip(){
   const e=token(),r=token();
@@ -634,15 +751,38 @@ window.setDayPlanStatus=(dayNo,value)=>{
   queueCloudSave();
 };
 
+
+window.addEventListener("storage",e=>{
+  if(e.key!==localKey()||!e.newValue)return;
+  try{
+    const incoming=migrateEdits(JSON.parse(e.newValue));
+    if(Date.parse(incoming.lastModified||0)>Date.parse(edits.lastModified||0)){
+      edits=incoming;
+      renderAll();
+      setSync("已收到此裝置其他分頁更新");
+    }
+  }catch{}
+});
+window.addEventListener("pageshow",()=>{
+  if(tripId&&activeToken()&&navigator.onLine)reconcileCloudState().catch(()=>{});
+});
+document.addEventListener("visibilitychange",()=>{
+  if(!document.hidden){
+    swRegistration?.update().catch(()=>{});
+    if(tripId&&activeToken()&&navigator.onLine)reconcileCloudState().catch(()=>{});
+  }
+});
+
 async function init(){
   try{
     [trip,hotel,dayOverrides]=await Promise.all([loadJson("./public/data/osaka-2026.json"),loadJson("./public/data/hotel.json"),loadJson("./public/data/day-overrides.json").catch(()=>({days:[]}))]);
     trip=applyDayOverrides(trip,dayOverrides);
     loadLocalEdits();
-    if(tripId&&activeToken()){try{await fetchCloud();setSync("雲端已連線")}catch(e){console.error(e);setSync("雲端讀取失敗，顯示本機資料")}}
+    if(tripId&&activeToken()){try{await reconcileCloudState()}catch(e){console.error(e);setSync(navigator.onLine?"雲端讀取失敗，顯示本機資料":"離線模式｜顯示本機資料")}}
     await appendBeautyProducts(false);
     $("#boot").classList.add("hidden");$("#app").classList.remove("hidden");renderAll();loadAllWeather();
-    if(tripId&&activeToken())setInterval(async()=>{if(document.hidden)return;try{const before=JSON.stringify(edits);await fetchCloud();if(JSON.stringify(edits)!==before){renderAll();setSync("已收到其他裝置更新")}}catch{}},7000);
+    if(tripId&&activeToken())setInterval(()=>{if(!document.hidden&&navigator.onLine)reconcileCloudState().catch(()=>{})},15000);
+    updateInstallUI();setConnectionState();registerServiceWorker();
   }catch(e){$("#boot").innerHTML=`<div style="padding:24px;text-align:center"><b>資料載入失敗</b><p>${esc(e.message)}</p></div>`}
 }
 
@@ -653,10 +793,10 @@ $("#createCloudTrip").onclick=createCloudTrip;
 $("#joinTrip").onclick=()=>{try{location.href=new URL($("#joinTripUrl").value.trim()).toString()}catch{alert("網址格式不正確")}};
 $("#copyEditLink").onclick=()=>copyText(editLink());
 $("#copyReadLink").onclick=()=>copyText(readLink());
-$("#syncNow").onclick=saveCloud;
+$("#syncNow").onclick=()=>reconcileCloudState().catch(()=>setConnectionState(false));
 $("#exportState").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(edits,null,2)],{type:"application/json"}));a.download="osaka-2026-edits.json";a.click();URL.revokeObjectURL(a.href)};
 $("#importState").onchange=e=>{const r=new FileReader();r.onload=()=>{try{edits={...edits,...JSON.parse(r.result)};queueCloudSave()}catch{alert("檔案格式錯誤")}};r.readAsText(e.target.files[0])};
 $("#clearEdits").onclick=()=>{if(confirm("清除所有個人修改？原始行程仍會保留。")){const share=edits.shareToken;edits=migrateEdits({shareToken:share});queueCloudSave()}};
 
-$("#addPrepItem").onclick=addPrep;$("#addShopping").onclick=addShopping;$("#appendBeautyProducts").onclick=()=>appendBeautyProducts(true);
+$("#addPrepItem").onclick=addPrep;$("#addShopping").onclick=addShopping;$("#appendBeautyProducts").onclick=()=>appendBeautyProducts(true);$("#installApp").onclick=installTravelApp;
 init();

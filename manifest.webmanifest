@@ -1,6 +1,6 @@
 {
   "name": "Travel Companion｜Osaka 2026",
-  "short_name": "Travel Companion",
+  "short_name": "Osaka 2026",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f4efe9",
@@ -16,5 +16,13 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "id": "./",
+  "scope": "./",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "portrait-primary",
+  "description": "Osaka 2026 行程、天氣、住宿與必買代購旅遊手冊"
 }

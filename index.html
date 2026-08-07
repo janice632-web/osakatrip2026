@@ -4,11 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#f4efe9">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Osaka 2026">
   <title>OSAKA 2026｜Janice's Journey</title>
-  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="manifest" href="./manifest.webmanifest?v=410-phase3">
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
-  <link rel="stylesheet" href="./assets/app.css">
+  <link rel="stylesheet" href="./assets/app.css?v=410-phase3">
 </head>
 <body>
   <div id="boot" class="boot">正在讀取 Osaka 2026…</div>
@@ -17,7 +20,7 @@
     <header class="hero">
       <div class="hero-shade"></div>
       <div class="hero-inner">
-        <div class="eyebrow">TRAVEL COMPANION V4.0.0</div>
+        <div class="eyebrow">TRAVEL COMPANION V4.1.0</div>
         <h1>OSAKA 2026<br><span>Janice’s Journey</span></h1>
         <p id="tripDates">2026.08.12—08.17｜6天5夜</p>
 
@@ -180,6 +183,15 @@
           </div>
         </section>
 
+
+        <section id="installPanel" class="panel">
+          <div class="section-head">
+            <div><small>PWA</small><h3>加入主畫面</h3></div>
+          </div>
+          <p id="installHint" class="muted">可將旅遊手冊安裝到手機主畫面，離線時仍可查看已載入的行程與資料。</p>
+          <button id="installApp" class="primary-action">加入主畫面</button>
+        </section>
+
         <section id="tripManagePanel" class="panel hidden">
           <div class="manage-list">
             <button id="copyEditLink">複製私人編輯網址</button>
@@ -211,6 +223,6 @@
       </menu>
     </form>
   </dialog>
-<script defer src="./assets/app.js?v=400-stable1"></script>
+<script defer src="./assets/app.js?v=410-phase3"></script>
 </body>
 </html>

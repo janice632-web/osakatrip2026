@@ -1,10 +1,12 @@
-const CACHE_NAME = "travel-companion-v4-0-0-stable1";
-const APP_SHELL = [
+const APP_VERSION="4.1.0";
+const STATIC_CACHE="travel-companion-static-v4-1-0";
+const RUNTIME_CACHE="travel-companion-runtime-v4-1-0";
+const APP_SHELL=[
   "./",
   "./index.html",
-  "./assets/app.css",
-  "./assets/app.js?v=400-stable1",
-  "./manifest.webmanifest",
+  "./assets/app.css?v=410-phase3",
+  "./assets/app.js?v=410-phase3",
+  "./manifest.webmanifest?v=410-phase3",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./public/data/osaka-2026.json",
@@ -24,47 +26,69 @@ const APP_SHELL = [
   "./assets/products/skin-aqua.jpg"
 ];
 
-self.addEventListener("install", event => {
-  self.skipWaiting();
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)));
-});
-
-self.addEventListener("activate", event => {
+self.addEventListener("install",event=>{
   event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))))
-      .then(() => self.clients.claim())
+    caches.open(STATIC_CACHE)
+      .then(cache=>cache.addAll(APP_SHELL))
+      .then(()=>self.skipWaiting())
   );
 });
 
-self.addEventListener("fetch", event => {
-  if(event.request.method !== "GET") return;
-  const url = new URL(event.request.url);
-  if(url.hostname.includes("supabase.co") || url.hostname.includes("open-meteo.com")) return;
+self.addEventListener("activate",event=>{
+  event.waitUntil(
+    caches.keys()
+      .then(keys=>Promise.all(keys.filter(key=>![STATIC_CACHE,RUNTIME_CACHE].includes(key)).map(key=>caches.delete(key))))
+      .then(()=>self.clients.claim())
+  );
+});
 
-  const isCore =
-    event.request.mode === "navigate" ||
-    /\/index\.html$/.test(url.pathname) ||
-    /\/assets\/app\.(js|css)$/.test(url.pathname);
+self.addEventListener("message",event=>{
+  if(event.data?.type==="SKIP_WAITING")self.skipWaiting();
+});
 
-  if(isCore){
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          const copy=response.clone();
-          caches.open(CACHE_NAME).then(cache=>cache.put(event.request,copy));
-          return response;
-        })
-        .catch(()=>caches.match(event.request))
-    );
+async function networkFirst(request){
+  const cache=await caches.open(RUNTIME_CACHE);
+  try{
+    const response=await fetch(request);
+    if(response && (response.ok || response.type==="opaque"))cache.put(request,response.clone());
+    return response;
+  }catch{
+    return (await cache.match(request)) || (await caches.match(request));
+  }
+}
+
+async function staleWhileRevalidate(request){
+  const cache=await caches.open(RUNTIME_CACHE);
+  const cached=await cache.match(request);
+  const network=fetch(request).then(response=>{
+    if(response && (response.ok || response.type==="opaque"))cache.put(request,response.clone());
+    return response;
+  }).catch(()=>null);
+  return cached || (await network) || (await caches.match(request));
+}
+
+self.addEventListener("fetch",event=>{
+  if(event.request.method!=="GET")return;
+  const request=event.request;
+  const url=new URL(request.url);
+
+  if(request.destination==="image"){
+    event.respondWith(staleWhileRevalidate(request));
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
-      const copy=response.clone();
-      caches.open(CACHE_NAME).then(cache=>cache.put(event.request,copy));
-      return response;
-    }))
-  );
+  if(url.hostname.includes("supabase.co") || url.hostname.includes("open-meteo.com"))return;
+
+  const isCore =
+    request.mode==="navigate" ||
+    /\/index\.html$/.test(url.pathname) ||
+    /\/assets\/app\.(js|css)$/.test(url.pathname) ||
+    /\/manifest\.webmanifest$/.test(url.pathname);
+
+  if(isCore){
+    event.respondWith(networkFirst(request));
+    return;
+  }
+
+  event.respondWith(staleWhileRevalidate(request));
 });

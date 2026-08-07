@@ -107,3 +107,7 @@ menu{display:flex;justify-content:flex-end;gap:8px;padding:12px 0 0;margin:0}
 
 .shopping-header-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
 @media(max-width:520px){.shopping-header-actions{width:100%;justify-content:flex-start}.shopping-header-actions button{flex:1}}
+
+#installPanel .primary-action{width:100%}
+html[data-connection="offline"] #syncBar{border-color:rgba(255,214,102,.55)}
+html[data-connection="offline"] #syncStatus::before{content:"● "}

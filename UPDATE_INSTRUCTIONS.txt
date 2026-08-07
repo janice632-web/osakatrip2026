@@ -1,0 +1,26 @@
+V4.1.0 第 3 階段
+
+覆蓋／新增：
+- assets/app.js
+- assets/app.css
+- index.html
+- manifest.webmanifest
+- service-worker.js
+- README.md
+- V4_1_VALIDATION.json
+
+不要動：
+- public/data/
+- assets/products/
+- icons/
+- SUPABASE_SETUP.sql
+
+功能：
+- PWA 離線使用
+- iPhone/iPad 加入主畫面引導
+- Service Worker 自動更新版本
+- Supabase 多裝置同步強化
+- 離線修改恢復連線後自動同步
+
+Commit：
+V4.1.0 phase 3 PWA sync

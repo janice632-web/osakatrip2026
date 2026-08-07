@@ -1,0 +1,22 @@
+{
+  "version": "4.1.0",
+  "javascript_syntax": "PASS",
+  "service_worker_syntax": "PASS",
+  "public_data_unchanged": true,
+  "pwa_service_worker_registration": true,
+  "offline_app_shell": true,
+  "ios_add_to_home_screen_guidance": true,
+  "automatic_version_update": true,
+  "supabase_multi_device_sync": true,
+  "offline_local_edits_then_reconcile": true,
+  "public_data_files": {
+    "hotel.json": true,
+    "luggage.json": true,
+    "transport.json": true,
+    "shopping.json": true,
+    "day-overrides.json": true,
+    "tickets.json": true,
+    "osaka-2026.json": true,
+    "wishlist.json": true
+  }
+}
