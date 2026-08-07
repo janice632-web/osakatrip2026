@@ -1,4 +1,4 @@
-# Osaka Travel Companion V4.1.0
+# Osaka Travel Companion V4.2.0
 
 穩定維護版。程式統一為 `assets/app.js` 與 `assets/app.css`。
 
@@ -11,9 +11,18 @@
 後續程式更新原則上只需替換 `assets/app.js`、`assets/app.css`、`index.html`、`service-worker.js`。
 
 
-## V4.1.0 第 3 階段
+## V4.2.0 第 3 階段
 - PWA 離線模式與 Service Worker 正式註冊
 - iPhone／iPad 加入主畫面引導
 - 新版本自動偵測、啟用並重新載入
 - Supabase 多裝置同步強化
 - 離線修改先存本機，恢復連線後自動比對同步
+
+
+## V4.2.0 必買／代購中心
+- 全部／依人／依商品三種檢視
+- 點人名查看個人商品、件數與金額
+- 同商品多人購買合併統計
+- 點商品展開購買人與各自數量
+- 商品搜尋
+- 名稱／價格／新增時間排序

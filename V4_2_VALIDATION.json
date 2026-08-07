@@ -1,0 +1,40 @@
+{
+  "version": "4.2.0",
+  "javascript_syntax": "PASS",
+  "public_data_unchanged": true,
+  "shopping_views": [
+    "all",
+    "person",
+    "product"
+  ],
+  "person_filter": true,
+  "per_person_amount_and_count": true,
+  "product_multi_person_grouping": true,
+  "product_expand_buyers": true,
+  "shopping_search": true,
+  "shopping_sort": [
+    "newest",
+    "name",
+    "price"
+  ],
+  "excluded_features": [
+    "favorite_product",
+    "purchase_progress",
+    "payment_status",
+    "shopping_mode",
+    "stock_shortage",
+    "store_switching",
+    "store_route",
+    "return_home_mode"
+  ],
+  "public_data_files": {
+    "hotel.json": true,
+    "luggage.json": true,
+    "transport.json": true,
+    "shopping.json": true,
+    "day-overrides.json": true,
+    "tickets.json": true,
+    "osaka-2026.json": true,
+    "wishlist.json": true
+  }
+}

@@ -11,7 +11,7 @@
   <link rel="manifest" href="./manifest.webmanifest?v=410-phase3">
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
-  <link rel="stylesheet" href="./assets/app.css?v=410-phase3">
+  <link rel="stylesheet" href="./assets/app.css?v=420-shopping1">
 </head>
 <body>
   <div id="boot" class="boot">正在讀取 Osaka 2026…</div>
@@ -20,7 +20,7 @@
     <header class="hero">
       <div class="hero-shade"></div>
       <div class="hero-inner">
-        <div class="eyebrow">TRAVEL COMPANION V4.1.0</div>
+        <div class="eyebrow">TRAVEL COMPANION V4.2.0</div>
         <h1>OSAKA 2026<br><span>Janice’s Journey</span></h1>
         <p id="tripDates">2026.08.12—08.17｜6天5夜</p>
 
@@ -144,6 +144,22 @@
               <button id="addShopping" class="small-action">新增</button>
             </div>
           </div>
+
+          <div class="shopping-view-tabs" id="shoppingViewTabs">
+            <button data-shopping-view="all" class="active">全部</button>
+            <button data-shopping-view="person">依人</button>
+            <button data-shopping-view="product">依商品</button>
+          </div>
+
+          <div class="shopping-filter-row">
+            <input id="shoppingSearch" type="search" placeholder="搜尋商品">
+            <select id="shoppingSort">
+              <option value="newest">新增時間</option>
+              <option value="name">名稱</option>
+              <option value="price">價格</option>
+            </select>
+          </div>
+
           <div id="shoppingStats" class="mini-stats"></div>
           <div id="personSummary"></div>
           <div id="shoppingList"></div>
@@ -223,6 +239,6 @@
       </menu>
     </form>
   </dialog>
-<script defer src="./assets/app.js?v=410-phase3"></script>
+<script defer src="./assets/app.js?v=420-shopping1"></script>
 </body>
 </html>

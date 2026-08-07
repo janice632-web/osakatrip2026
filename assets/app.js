@@ -700,17 +700,163 @@ function renderPrep(){
 window.togglePrep=id=>{const x=edits.prepItems.find(v=>v.id===id);x.done=!x.done;queueCloudSave()};
 window.deletePrep=id=>{edits.prepItems=edits.prepItems.filter(x=>x.id!==id);queueCloudSave()};
 function addPrep(){openEditor("新增行前準備",[{name:"name",label:"項目",type:"text",value:""}],v=>{edits.prepItems.push({id:"prep-"+crypto.randomUUID(),name:v.name,done:false});queueCloudSave()})}
+
+let shoppingView="all";
+let shoppingPerson="";
+let shoppingSearchText="";
+let shoppingSortMode="newest";
+
+function normalizeProductName(value){
+  return String(value||"")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g," ")
+    .replace(/[（）]/g,m=>m==="（"?"(":")");
+}
+function shoppingCreatedAt(item,index){
+  if(item.createdAt)return Date.parse(item.createdAt)||0;
+  const id=String(item.id||"");
+  const uuidTime=id.match(/(\d{10,13})/);
+  return uuidTime?Number(uuidTime[1]):index;
+}
+function sortedShoppingItems(items){
+  const indexed=items.map((item,index)=>({item,index}));
+  indexed.sort((a,b)=>{
+    if(shoppingSortMode==="name"){
+      return String(a.item.name||"").localeCompare(String(b.item.name||""),"zh-Hant");
+    }
+    if(shoppingSortMode==="price"){
+      return Number(b.item.unitPrice||0)-Number(a.item.unitPrice||0);
+    }
+    return shoppingCreatedAt(b.item,b.index)-shoppingCreatedAt(a.item,a.index);
+  });
+  return indexed.map(x=>x.item);
+}
+function visibleShoppingItems(){
+  let items=[...edits.shopping];
+  const q=shoppingSearchText.trim().toLowerCase();
+  if(q){
+    items=items.filter(x=>
+      String(x.name||"").toLowerCase().includes(q) ||
+      String(x.person||"").toLowerCase().includes(q)
+    );
+  }
+  if(shoppingView==="person"&&shoppingPerson){
+    items=items.filter(x=>(x.person||"自己")===shoppingPerson);
+  }
+  return sortedShoppingItems(items);
+}
+function groupShoppingByProduct(items){
+  const groups=new Map();
+  items.forEach(item=>{
+    const key=normalizeProductName(item.name);
+    if(!groups.has(key)){
+      groups.set(key,{
+        key,
+        name:item.name||"未命名商品",
+        image:item.image||"",
+        unitPrice:Number(item.unitPrice)||0,
+        entries:[],
+        totalQty:0,
+        totalAmount:0
+      });
+    }
+    const group=groups.get(key);
+    group.entries.push(item);
+    group.totalQty+=Number(item.qty)||0;
+    group.totalAmount+=shoppingAmount(item);
+    if(!group.image&&item.image)group.image=item.image;
+  });
+  return [...groups.values()];
+}
+function renderShoppingPersonSummary(items){
+  const people={};
+  edits.shopping.forEach(x=>{
+    const p=x.person||"自己";
+    if(!people[p])people[p]={amount:0,qty:0,rows:0};
+    people[p].amount+=shoppingAmount(x);
+    people[p].qty+=Number(x.qty)||0;
+    people[p].rows+=1;
+  });
+  const container=$("#personSummary");
+  if(shoppingView!=="person"){
+    container.innerHTML="";
+    return;
+  }
+  container.innerHTML=`<div class="person-filter-list">
+    <button class="${shoppingPerson===""?"active":""}" data-person="">全部人</button>
+    ${Object.entries(people).map(([name,data])=>`
+      <button class="${shoppingPerson===name?"active":""}" data-person="${esc(name)}">
+        <span>${esc(name)}</span>
+        <small>${data.rows} 項｜${data.qty} 件｜¥${data.amount.toLocaleString()}</small>
+      </button>`).join("")}
+  </div>`;
+  $$("#personSummary [data-person]").forEach(button=>{
+    button.onclick=()=>{
+      shoppingPerson=button.dataset.person||"";
+      renderShopping();
+    };
+  });
+}
+function renderProductGroupCard(group){
+  const people={};
+  group.entries.forEach(item=>{
+    const name=item.person||"自己";
+    if(!people[name])people[name]=0;
+    people[name]+=Number(item.qty)||0;
+  });
+  return `<details class="product-group-card">
+    <summary>
+      ${group.image?`<img src="${group.image}" loading="lazy" alt="">`:'<div class="photo-placeholder">無照片</div>'}
+      <div class="product-group-main">
+        <h4>${esc(group.name)}</h4>
+        <p>總數量：${group.totalQty}｜預估總額：¥${group.totalAmount.toLocaleString()}</p>
+        ${group.unitPrice?`<small>參考單價 ¥${group.unitPrice.toLocaleString()}</small>`:""}
+      </div>
+      <span class="product-group-toggle">▼</span>
+    </summary>
+    <div class="product-buyers">
+      ${Object.entries(people).map(([name,qty])=>`
+        <div><b>${esc(name)}</b><span>× ${qty}</span></div>`).join("")}
+    </div>
+  </details>`;
+}
+
 function shoppingAmount(x){return (Number(x.qty)||0)*(Number(x.unitPrice)||0)}
 function renderShopping(){
-  const total=edits.shopping.reduce((s,x)=>s+shoppingAmount(x),0),done=edits.shopping.filter(x=>x.done).length;
-  $("#shoppingStats").innerHTML=`<div><b>${edits.shopping.length}</b><span>全部</span></div><div><b>${done}</b><span>已購買</span></div><div><b>¥${total.toLocaleString()}</b><span>總金額</span></div>`;
-  const people={};edits.shopping.forEach(x=>{const p=x.person||"自己";people[p]=(people[p]||0)+shoppingAmount(x)});
-  $("#personSummary").innerHTML=Object.entries(people).map(([p,v])=>`<div class="person-chip"><span>${esc(p)}</span><b>¥${v.toLocaleString()}</b></div>`).join("");
-  $("#shoppingList").innerHTML=edits.shopping.map(x=>`<article class="shopping-card ${x.done?"done":""}">
+  const filtered=visibleShoppingItems();
+  const total=filtered.reduce((s,x)=>s+shoppingAmount(x),0);
+  const totalQty=filtered.reduce((s,x)=>s+(Number(x.qty)||0),0);
+  $("#shoppingStats").innerHTML=`<div><b>${filtered.length}</b><span>商品項目</span></div><div><b>${totalQty}</b><span>總件數</span></div><div><b>¥${total.toLocaleString()}</b><span>總金額</span></div>`;
+
+  $$("#shoppingViewTabs [data-shopping-view]").forEach(button=>{
+    button.classList.toggle("active",button.dataset.shoppingView===shoppingView);
+  });
+
+  renderShoppingPersonSummary(filtered);
+
+  if(shoppingView==="product"){
+    const groups=groupShoppingByProduct(filtered);
+    $("#shoppingList").innerHTML=groups.length
+      ? groups.map(renderProductGroupCard).join("")
+      : '<div class="today-empty">找不到符合條件的商品。</div>';
+    return;
+  }
+
+  $("#shoppingList").innerHTML=filtered.map(x=>`<article class="shopping-card ${x.done?"done":""}">
     ${x.image?`<img src="${x.image}" alt="" loading="lazy">`:'<div class="photo-placeholder">無照片</div>'}
-    <div class="shopping-body"><h4>${esc(x.name)}</h4><p>${x.referencePrice?"日本參考價 ":""}¥${Number(x.unitPrice||0).toLocaleString()}${Number(x.qty||0)!==1?` × ${Number(x.qty)||0}＝¥${shoppingAmount(x).toLocaleString()}`:""}</p><p>委託人：${esc(x.person||"自己")}</p></div>
-    <div class="tool-actions"><button onclick="toggleShopping('${x.id}')">✓</button><button onclick="editShopping('${x.id}')">編輯</button><button onclick="shoppingPhoto('${x.id}')">照片</button><button onclick="deleteShopping('${x.id}')">刪除</button></div>
-  </article>`).join("")||'<div class="today-empty">尚無必買／代購項目。</div>';
+    <div class="shopping-body">
+      <h4>${esc(x.name)}</h4>
+      <p>${x.referencePrice?"日本參考價 ":""}¥${Number(x.unitPrice||0).toLocaleString()}${Number(x.qty||0)!==1?` × ${Number(x.qty)||0}＝¥${shoppingAmount(x).toLocaleString()}`:""}</p>
+      <p>委託人：${esc(x.person||"自己")}｜數量：${Number(x.qty)||0}</p>
+    </div>
+    <div class="tool-actions">
+      <button onclick="toggleShopping('${x.id}')">✓</button>
+      <button onclick="editShopping('${x.id}')">編輯</button>
+      <button onclick="shoppingPhoto('${x.id}')">照片</button>
+      <button onclick="deleteShopping('${x.id}')">刪除</button>
+    </div>
+  </article>`).join("")||'<div class="today-empty">找不到符合條件的商品。</div>';
 }
 window.toggleShopping=id=>{const x=edits.shopping.find(v=>v.id===id);x.done=!x.done;queueCloudSave()};
 window.deleteShopping=id=>{if(confirm("刪除此項目？")){edits.shopping=edits.shopping.filter(x=>x.id!==id);queueCloudSave()}};
@@ -719,7 +865,7 @@ window.editShopping=id=>{const x=edits.shopping.find(v=>v.id===id);openEditor("�
 ],v=>{Object.assign(x,v,{qty:Number(v.qty)||0,unitPrice:Number(v.unitPrice)||0});queueCloudSave()})};
 function addShopping(){openEditor("新增必買／代購",[
   {name:"name",label:"商品",type:"text",value:""},{name:"qty",label:"數量",type:"text",value:"1"},{name:"unitPrice",label:"單價（日圓）",type:"text",value:"0"},{name:"person",label:"委託人",type:"text",value:"自己"}
-],v=>{edits.shopping.unshift({...v,id:"shop-"+crypto.randomUUID(),qty:Number(v.qty)||0,unitPrice:Number(v.unitPrice)||0,done:false,image:""});queueCloudSave()})}
+],v=>{edits.shopping.unshift({...v,id:"shop-"+crypto.randomUUID(),qty:Number(v.qty)||0,unitPrice:Number(v.unitPrice)||0,done:false,image:"",createdAt:new Date().toISOString()});queueCloudSave()})}
 window.shoppingPhoto=id=>pickImage(async file=>{try{setSync("上傳商品照片中…");const url=await uploadImage(file,"shopping");edits.shopping.find(v=>v.id===id).image=url;queueCloudSave()}catch(e){alert("上傳失敗："+e.message)}})
 
 async function loadAllWeather(){await Promise.all(trip.days.map(loadWeatherForDay));renderForecast();renderDay(activeDay);renderToday();if(window.renderTodayReminder)window.renderTodayReminder()}
@@ -799,4 +945,20 @@ $("#importState").onchange=e=>{const r=new FileReader();r.onload=()=>{try{edits=
 $("#clearEdits").onclick=()=>{if(confirm("清除所有個人修改？原始行程仍會保留。")){const share=edits.shareToken;edits=migrateEdits({shareToken:share});queueCloudSave()}};
 
 $("#addPrepItem").onclick=addPrep;$("#addShopping").onclick=addShopping;$("#appendBeautyProducts").onclick=()=>appendBeautyProducts(true);$("#installApp").onclick=installTravelApp;
+
+$("#shoppingSearch").oninput=e=>{
+  shoppingSearchText=e.target.value||"";
+  renderShopping();
+};
+$("#shoppingSort").onchange=e=>{
+  shoppingSortMode=e.target.value||"newest";
+  renderShopping();
+};
+$$("#shoppingViewTabs [data-shopping-view]").forEach(button=>{
+  button.onclick=()=>{
+    shoppingView=button.dataset.shoppingView||"all";
+    if(shoppingView!=="person")shoppingPerson="";
+    renderShopping();
+  };
+});
 init();
