@@ -207,7 +207,7 @@ async function uploadImage(file,folder){
 
 
 
-const APP_VERSION="4.2.3";
+const APP_VERSION="4.2.4";
 
 const PWA_LAUNCH_KEY="tc-pwa-launch-url-v1";
 
@@ -877,6 +877,7 @@ function visibleShoppingItems(){
   if(q){
     items=items.filter(x=>
       String(x.name||"").toLowerCase().includes(q) ||
+      String(x.spec||"").toLowerCase().includes(q) ||
       String(x.person||"").toLowerCase().includes(q)
     );
   }
@@ -888,11 +889,12 @@ function visibleShoppingItems(){
 function groupShoppingByProduct(items){
   const groups=new Map();
   items.forEach(item=>{
-    const key=normalizeProductName(item.name);
+    const key=normalizeProductName(item.name)+"||"+normalizeProductName(item.spec);
     if(!groups.has(key)){
       groups.set(key,{
         key,
         name:item.name||"未命名商品",
+        spec:item.spec||"",
         image:item.image||"",
         unitPrice:Number(item.unitPrice)||0,
         entries:[],
@@ -946,9 +948,10 @@ function renderProductGroupCard(group){
   });
   return `<details class="product-group-card">
     <summary>
-      ${group.image?`<img class="shopping-zoom-image" src="${group.image}" loading="lazy" alt="${esc(group.name)}" data-caption="${esc(group.name)}" role="button" tabindex="0" title="點擊放大">`:'<div class="photo-placeholder">無照片</div>'}
+      ${group.image?`<img class="shopping-zoom-image" src="${group.image}" loading="lazy" alt="${esc(group.name)}" data-caption="${esc(group.name+(group.spec?`｜${group.spec}`:""))}" role="button" tabindex="0" title="點擊放大">`:'<div class="photo-placeholder">無照片</div>'}
       <div class="product-group-main">
         <h4>${esc(group.name)}</h4>
+        ${group.spec?`<div class="shopping-spec">規格：${esc(group.spec)}</div>`:""}
         <p>總數量：${group.totalQty}｜預估總額：¥${group.totalAmount.toLocaleString()}</p>
         ${group.unitPrice?`<small>參考單價 ¥${group.unitPrice.toLocaleString()}</small>`:""}
       </div>
@@ -984,9 +987,10 @@ function renderShopping(){
   }
 
   $("#shoppingList").innerHTML=filtered.map(x=>`<article class="shopping-card ${x.done?"done":""}">
-    ${x.image?`<img class="shopping-zoom-image" src="${x.image}" alt="${esc(x.name)}" data-caption="${esc(x.name)}" loading="lazy" role="button" tabindex="0" title="點擊放大">`:'<div class="photo-placeholder">無照片</div>'}
+    ${x.image?`<img class="shopping-zoom-image" src="${x.image}" alt="${esc(x.name)}" data-caption="${esc(x.name+(x.spec?`｜${x.spec}`:""))}" loading="lazy" role="button" tabindex="0" title="點擊放大">`:'<div class="photo-placeholder">無照片</div>'}
     <div class="shopping-body">
       <h4>${esc(x.name)}</h4>
+      ${x.spec?`<div class="shopping-spec">規格：${esc(x.spec)}</div>`:""}
       <p>${x.referencePrice?"日本參考價 ":""}¥${Number(x.unitPrice||0).toLocaleString()}${Number(x.qty||0)!==1?` × ${Number(x.qty)||0}＝¥${shoppingAmount(x).toLocaleString()}`:""}</p>
       <p>委託人：${esc(x.person||"自己")}｜數量：${Number(x.qty)||0}</p>
     </div>
@@ -1002,10 +1006,10 @@ function renderShopping(){
 window.toggleShopping=id=>{const x=edits.shopping.find(v=>v.id===id);x.done=!x.done;queueCloudSave()};
 window.deleteShopping=id=>{if(confirm("刪除此項目？")){edits.shopping=edits.shopping.filter(x=>x.id!==id);queueCloudSave()}};
 window.editShopping=id=>{const x=edits.shopping.find(v=>v.id===id);openEditor("編輯必買／代購",[
-  {name:"name",label:"商品",type:"text",value:x.name},{name:"qty",label:"數量",type:"text",value:x.qty},{name:"unitPrice",label:"單價（日圓）",type:"text",value:x.unitPrice},{name:"person",label:"委託人",type:"text",value:x.person}
+  {name:"name",label:"商品",type:"text",value:x.name},{name:"spec",label:"規格",type:"text",value:x.spec||""},{name:"qty",label:"數量",type:"text",value:x.qty},{name:"unitPrice",label:"單價（日圓）",type:"text",value:x.unitPrice},{name:"person",label:"委託人",type:"text",value:x.person}
 ],v=>{Object.assign(x,v,{qty:Number(v.qty)||0,unitPrice:Number(v.unitPrice)||0});queueCloudSave()})};
 function addShopping(){openEditor("新增必買／代購",[
-  {name:"name",label:"商品",type:"text",value:""},{name:"qty",label:"數量",type:"text",value:"1"},{name:"unitPrice",label:"單價（日圓）",type:"text",value:"0"},{name:"person",label:"委託人",type:"text",value:"自己"}
+  {name:"name",label:"商品",type:"text",value:""},{name:"spec",label:"規格",type:"text",value:""},{name:"qty",label:"數量",type:"text",value:"1"},{name:"unitPrice",label:"單價（日圓）",type:"text",value:"0"},{name:"person",label:"委託人",type:"text",value:"自己"}
 ],v=>{edits.shopping.unshift({...v,id:"shop-"+crypto.randomUUID(),qty:Number(v.qty)||0,unitPrice:Number(v.unitPrice)||0,done:false,image:"",createdAt:new Date().toISOString()});queueCloudSave()})}
 window.shoppingPhoto=id=>pickImage(async file=>{try{setSync("處理商品照片中…");const url=await uploadImage(file,"shopping");const item=edits.shopping.find(v=>v.id===id);if(!item)throw new Error("找不到商品資料");item.image=url;setSync("照片已上傳，正在同步…");queueCloudSave()}catch(e){console.error(e);setSync("照片上傳失敗");alert("商品照片上傳失敗：\n"+e.message)}})
 

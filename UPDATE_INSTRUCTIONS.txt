@@ -1,19 +1,4 @@
-V4.2.3 手機照片上傳修正
-
-覆蓋／新增：
-- assets/app.js
-- index.html
-- service-worker.js
-- README.md
-- V4_2_3_VALIDATION.json
-
-不要動：
-- public/data/
-- assets/products/
-- manifest.webmanifest
-- SUPABASE_SETUP.sql
-
-部署後請在手機重新開啟網站／主畫面 App，再測試「必買／代購 → 照片」。
-
-Commit：
-V4.2.3 fix mobile photo upload
+V4.2.4 商品規格
+覆蓋：assets/app.js、assets/app.css、index.html、service-worker.js、README.md、V4_2_4_VALIDATION.json
+不要動：public/data/、assets/products/、manifest.webmanifest、SUPABASE_SETUP.sql
+Commit：V4.2.4 add shopping product specifications

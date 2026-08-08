@@ -1,0 +1,20 @@
+{
+  "version": "4.2.4",
+  "javascript_syntax": "PASS",
+  "service_worker_syntax": "PASS",
+  "public_data_unchanged": true,
+  "shopping_spec_field": true,
+  "product_grouping_includes_spec": true,
+  "search_includes_spec": true,
+  "legacy_items_supported": true,
+  "public_data_files": {
+    "day-overrides.json": true,
+    "osaka-2026.json": true,
+    "transport.json": true,
+    "hotel.json": true,
+    "tickets.json": true,
+    "luggage.json": true,
+    "wishlist.json": true,
+    "shopping.json": true
+  }
+}
