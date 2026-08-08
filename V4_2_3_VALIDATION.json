@@ -1,0 +1,21 @@
+{
+  "version": "4.2.3",
+  "javascript_syntax": "PASS",
+  "service_worker_syntax": "PASS",
+  "public_data_unchanged": true,
+  "mobile_file_picker_dom_attached": true,
+  "mobile_jpeg_conversion": true,
+  "max_image_side": 1200,
+  "shopping_photo_upload_fixed": true,
+  "itinerary_photo_pipeline_fixed": true,
+  "public_data_files": {
+    "day-overrides.json": true,
+    "osaka-2026.json": true,
+    "transport.json": true,
+    "hotel.json": true,
+    "tickets.json": true,
+    "luggage.json": true,
+    "wishlist.json": true,
+    "shopping.json": true
+  }
+}

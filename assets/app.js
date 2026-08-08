@@ -138,23 +138,76 @@ async function rpc(name,args){
   return body;
 }
 async function compressImage(file){
-  return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{let w=img.width,h=img.height,s=Math.min(1,1400/Math.max(w,h));w=Math.round(w*s);h=Math.round(h*s);const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);c.toBlob(b=>b?resolve(b):reject(new Error("圖片壓縮失敗")),"image/webp",.78)};img.onerror=reject;img.src=reader.result};reader.onerror=reject;reader.readAsDataURL(file)})
+  const maxSide=1200;
+  const quality=.82;
+
+  async function drawToJpeg(source,w,h){
+    const scale=Math.min(1,maxSide/Math.max(w,h));
+    const width=Math.max(1,Math.round(w*scale));
+    const height=Math.max(1,Math.round(h*scale));
+    const canvas=document.createElement("canvas");
+    canvas.width=width; canvas.height=height;
+    const ctx=canvas.getContext("2d");
+    ctx.drawImage(source,0,0,width,height);
+    return await new Promise((resolve,reject)=>{
+      canvas.toBlob(blob=>blob?resolve(blob):reject(new Error("圖片轉換失敗")),"image/jpeg",quality);
+    });
+  }
+
+  // createImageBitmap is more reliable for mobile-selected photos when available.
+  if("createImageBitmap" in window){
+    try{
+      const bitmap=await createImageBitmap(file);
+      const blob=await drawToJpeg(bitmap,bitmap.width,bitmap.height);
+      bitmap.close?.();
+      return blob;
+    }catch(e){
+      console.warn("createImageBitmap fallback",e);
+    }
+  }
+
+  return await new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>{
+      const img=new Image();
+      img.onload=async()=>{
+        try{resolve(await drawToJpeg(img,img.naturalWidth||img.width,img.naturalHeight||img.height))}
+        catch(e){reject(e)}
+      };
+      img.onerror=()=>reject(new Error("手機無法讀取這張照片，請改選 JPG／PNG 或先截圖後再上傳。"));
+      img.src=reader.result;
+    };
+    reader.onerror=()=>reject(new Error("讀取照片失敗"));
+    reader.readAsDataURL(file);
+  });
 }
 async function uploadImage(file,folder){
-  const path=`${tripId||"local"}/${folder}/${crypto.randomUUID()}.webp`,blob=await compressImage(file);
+  if(!file)throw new Error("沒有選取照片");
+  if(file.size>30*1024*1024)throw new Error("照片超過 30MB，請先縮小後再上傳");
+  const blob=await compressImage(file);
+  const path=`${tripId||"local"}/${folder}/${crypto.randomUUID()}.jpg`;
   const r=await fetch(`${SUPABASE_URL}/storage/v1/object/${STORAGE_BUCKET}/${path}`,{
     method:"POST",
-    headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"image/webp","x-upsert":"false"},
+    headers:{
+      "apikey":SUPABASE_KEY,
+      "Authorization":"Bearer "+SUPABASE_KEY,
+      "Content-Type":"image/jpeg",
+      "x-upsert":"false"
+    },
     body:blob
   });
-  const text=await r.text();if(!r.ok){let msg=text;try{msg=JSON.parse(text).message}catch{}throw new Error(msg)}
+  const text=await r.text();
+  if(!r.ok){
+    let msg=text;
+    try{msg=JSON.parse(text).message}catch{}
+    throw new Error(msg||`HTTP ${r.status}`);
+  }
   return `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${path}`;
 }
 
 
 
-
-const APP_VERSION="4.2.2";
+const APP_VERSION="4.2.3";
 
 const PWA_LAUNCH_KEY="tc-pwa-launch-url-v1";
 
@@ -681,9 +734,29 @@ window.editItem=id=>{const x=mergedItem(findBaseItem(id));openEditor("編輯行�
 window.addItem=day=>openEditor(`新增 Day ${day} 行程`,[
   {name:"time",label:"時間",type:"text",value:"09:00"},{name:"title",label:"名稱",type:"text",value:""},{name:"place",label:"地點",type:"text",value:""},{name:"summary",label:"重點提醒",type:"textarea",value:""}
 ],v=>{edits.addedItems.push({...v,id:"user-"+crypto.randomUUID(),day:Number(day),mapsQuery:v.place});queueCloudSave()});
-window.uploadItemImage=id=>pickImage(async file=>{try{setSync("上傳圖片中…");const url=await uploadImage(file,"itinerary");edits.itemOverrides[id]={...(edits.itemOverrides[id]||{}),image:url};queueCloudSave()}catch(e){alert("上傳失敗："+e.message)}});
+window.uploadItemImage=id=>pickImage(async file=>{try{setSync("處理圖片中…");const url=await uploadImage(file,"itinerary");edits.itemOverrides[id]={...(edits.itemOverrides[id]||{}),image:url};queueCloudSave()}catch(e){console.error(e);setSync("圖片上傳失敗");alert("圖片上傳失敗：\n"+e.message)}});
 
-function pickImage(callback){const input=document.createElement("input");input.type="file";input.accept="image/*";input.onchange=()=>input.files[0]&&callback(input.files[0]);input.click()}
+function pickImage(callback){
+  const input=document.createElement("input");
+  input.type="file";
+  input.accept="image/jpeg,image/png,image/webp";
+  input.setAttribute("aria-hidden","true");
+  input.style.position="fixed";
+  input.style.left="-9999px";
+  input.style.top="0";
+  document.body.appendChild(input);
+
+  const cleanup=()=>{setTimeout(()=>input.remove(),0)};
+  input.addEventListener("change",async()=>{
+    const file=input.files&&input.files[0];
+    if(!file){cleanup();return}
+    try{await callback(file)}finally{cleanup()}
+  },{once:true});
+  input.addEventListener("cancel",cleanup,{once:true});
+
+  // Must remain inside the original tap event for iOS Safari / installed PWA.
+  input.click();
+}
 function openEditor(title,fields,onSave){
   $("#editTitle").textContent=title;
   $("#editFields").innerHTML=fields.map(function(f){
@@ -934,7 +1007,7 @@ window.editShopping=id=>{const x=edits.shopping.find(v=>v.id===id);openEditor("�
 function addShopping(){openEditor("新增必買／代購",[
   {name:"name",label:"商品",type:"text",value:""},{name:"qty",label:"數量",type:"text",value:"1"},{name:"unitPrice",label:"單價（日圓）",type:"text",value:"0"},{name:"person",label:"委託人",type:"text",value:"自己"}
 ],v=>{edits.shopping.unshift({...v,id:"shop-"+crypto.randomUUID(),qty:Number(v.qty)||0,unitPrice:Number(v.unitPrice)||0,done:false,image:"",createdAt:new Date().toISOString()});queueCloudSave()})}
-window.shoppingPhoto=id=>pickImage(async file=>{try{setSync("上傳商品照片中…");const url=await uploadImage(file,"shopping");edits.shopping.find(v=>v.id===id).image=url;queueCloudSave()}catch(e){alert("上傳失敗："+e.message)}})
+window.shoppingPhoto=id=>pickImage(async file=>{try{setSync("處理商品照片中…");const url=await uploadImage(file,"shopping");const item=edits.shopping.find(v=>v.id===id);if(!item)throw new Error("找不到商品資料");item.image=url;setSync("照片已上傳，正在同步…");queueCloudSave()}catch(e){console.error(e);setSync("照片上傳失敗");alert("商品照片上傳失敗：\n"+e.message)}})
 
 async function loadAllWeather(){await Promise.all(trip.days.map(loadWeatherForDay));renderForecast();renderDay(activeDay);renderToday();if(window.renderTodayReminder)window.renderTodayReminder()}
 async function loadWeatherForDay(day){

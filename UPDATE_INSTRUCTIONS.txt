@@ -1,25 +1,19 @@
-V4.2.2 PWA 主畫面資料修正
+V4.2.3 手機照片上傳修正
 
 覆蓋／新增：
 - assets/app.js
-- assets/app.css
 - index.html
-- manifest.webmanifest
 - service-worker.js
 - README.md
-- V4_2_2_VALIDATION.json
+- V4_2_3_VALIDATION.json
 
 不要動：
 - public/data/
 - assets/products/
-- icons/
+- manifest.webmanifest
 - SUPABASE_SETUP.sql
 
-部署後：
-1. Safari 開啟目前「有最新資料」的旅程頁
-2. 更多 → 加入主畫面 → 更新主畫面旅程連結
-3. 若舊主畫面 App 仍是全新狀態，刪掉舊圖示
-4. 回 Safari 的目前旅程頁重新「加入主畫面」
+部署後請在手機重新開啟網站／主畫面 App，再測試「必買／代購 → 照片」。
 
 Commit：
-V4.2.2 fix PWA launch state
+V4.2.3 fix mobile photo upload
