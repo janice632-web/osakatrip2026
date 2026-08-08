@@ -1,4 +1,4 @@
-V4.2.4 商品規格
-覆蓋：assets/app.js、assets/app.css、index.html、service-worker.js、README.md、V4_2_4_VALIDATION.json
+V4.2.5 同商品不同規格合併
+覆蓋：assets/app.js、assets/app.css、index.html、service-worker.js、README.md、V4_2_5_VALIDATION.json
 不要動：public/data/、assets/products/、manifest.webmanifest、SUPABASE_SETUP.sql
-Commit：V4.2.4 add shopping product specifications
+Commit：V4.2.5 group same products across specifications

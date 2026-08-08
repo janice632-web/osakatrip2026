@@ -207,7 +207,7 @@ async function uploadImage(file,folder){
 
 
 
-const APP_VERSION="4.2.4";
+const APP_VERSION="4.2.5";
 
 const PWA_LAUNCH_KEY="tc-pwa-launch-url-v1";
 
@@ -889,12 +889,11 @@ function visibleShoppingItems(){
 function groupShoppingByProduct(items){
   const groups=new Map();
   items.forEach(item=>{
-    const key=normalizeProductName(item.name)+"||"+normalizeProductName(item.spec);
+    const key=normalizeProductName(item.name);
     if(!groups.has(key)){
       groups.set(key,{
         key,
         name:item.name||"未命名商品",
-        spec:item.spec||"",
         image:item.image||"",
         unitPrice:Number(item.unitPrice)||0,
         entries:[],
@@ -940,26 +939,39 @@ function renderShoppingPersonSummary(items){
   });
 }
 function renderProductGroupCard(group){
-  const people={};
+  const specs=new Map();
   group.entries.forEach(item=>{
-    const name=item.person||"自己";
-    if(!people[name])people[name]=0;
-    people[name]+=Number(item.qty)||0;
+    const spec=(item.spec||"").trim()||"未填規格";
+    if(!specs.has(spec))specs.set(spec,{qty:0,amount:0,people:{}});
+    const s=specs.get(spec);
+    const qty=Number(item.qty)||0;
+    s.qty+=qty;
+    s.amount+=shoppingAmount(item);
+    const person=item.person||"自己";
+    s.people[person]=(s.people[person]||0)+qty;
   });
   return `<details class="product-group-card">
     <summary>
-      ${group.image?`<img class="shopping-zoom-image" src="${group.image}" loading="lazy" alt="${esc(group.name)}" data-caption="${esc(group.name+(group.spec?`｜${group.spec}`:""))}" role="button" tabindex="0" title="點擊放大">`:'<div class="photo-placeholder">無照片</div>'}
+      ${group.image?`<img class="shopping-zoom-image" src="${group.image}" loading="lazy" alt="${esc(group.name)}" data-caption="${esc(group.name)}" role="button" tabindex="0" title="點擊放大">`:'<div class="photo-placeholder">無照片</div>'}
       <div class="product-group-main">
         <h4>${esc(group.name)}</h4>
-        ${group.spec?`<div class="shopping-spec">規格：${esc(group.spec)}</div>`:""}
         <p>總數量：${group.totalQty}｜預估總額：¥${group.totalAmount.toLocaleString()}</p>
-        ${group.unitPrice?`<small>參考單價 ¥${group.unitPrice.toLocaleString()}</small>`:""}
+        <small>${specs.size} 種規格</small>
       </div>
       <span class="product-group-toggle">▼</span>
     </summary>
-    <div class="product-buyers">
-      ${Object.entries(people).map(([name,qty])=>`
-        <div><b>${esc(name)}</b><span>× ${qty}</span></div>`).join("")}
+    <div class="product-spec-groups">
+      ${[...specs.entries()].map(([spec,data])=>`
+        <section class="product-spec-group">
+          <div class="product-spec-head">
+            <b>${esc(spec)}</b>
+            <span>${data.qty} 件${data.amount?`｜¥${data.amount.toLocaleString()}`:""}</span>
+          </div>
+          <div class="product-buyers">
+            ${Object.entries(data.people).map(([name,qty])=>`
+              <div><b>${esc(name)}</b><span>× ${qty}</span></div>`).join("")}
+          </div>
+        </section>`).join("")}
     </div>
   </details>`;
 }

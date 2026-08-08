@@ -304,3 +304,10 @@ body.lightbox-open{
 .pwa-repair-btn{width:100%;margin-top:8px}
 
 .shopping-spec{margin:3px 0;color:var(--muted);font-size:12px;font-weight:800}
+
+.product-spec-groups{border-top:1px solid var(--line);padding:4px 12px 12px}
+.product-spec-group{padding:8px 0;border-bottom:1px solid var(--line)}
+.product-spec-group:last-child{border-bottom:0}
+.product-spec-head{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:3px 0 5px}
+.product-spec-head span{font-size:12px;color:var(--muted)}
+.product-spec-group .product-buyers{border-top:0;padding:0}
