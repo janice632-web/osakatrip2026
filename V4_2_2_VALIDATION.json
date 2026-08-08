@@ -1,0 +1,20 @@
+{
+  "version": "4.2.2",
+  "javascript_syntax": "PASS",
+  "service_worker_syntax": "PASS",
+  "public_data_unchanged": true,
+  "fixed_manifest_start_url_removed": true,
+  "fixed_manifest_id_removed": true,
+  "standalone_launch_restore": true,
+  "repair_button": true,
+  "public_data_files": {
+    "tickets.json": true,
+    "day-overrides.json": true,
+    "osaka-2026.json": true,
+    "wishlist.json": true,
+    "shopping.json": true,
+    "luggage.json": true,
+    "hotel.json": true,
+    "transport.json": true
+  }
+}

@@ -154,7 +154,35 @@ async function uploadImage(file,folder){
 
 
 
-const APP_VERSION="4.1.0";
+const APP_VERSION="4.2.2";
+
+const PWA_LAUNCH_KEY="tc-pwa-launch-url-v1";
+
+function hasTripLaunchParams(url=new URL(location.href)){
+  return !!(url.searchParams.get("trip")||url.searchParams.get("edit")||url.searchParams.get("view"));
+}
+function rememberCurrentLaunchUrl(){
+  try{
+    const url=new URL(location.href);
+    if(hasTripLaunchParams(url)){
+      localStorage.setItem(PWA_LAUNCH_KEY,url.pathname+url.search+url.hash);
+    }
+  }catch{}
+}
+function restorePwaLaunchUrlIfNeeded(){
+  try{
+    if(!isStandaloneMode())return false;
+    const current=new URL(location.href);
+    if(hasTripLaunchParams(current))return false;
+    const saved=localStorage.getItem(PWA_LAUNCH_KEY);
+    if(!saved)return false;
+    const target=new URL(saved,location.origin);
+    if(target.origin!==location.origin)return false;
+    location.replace(target.href);
+    return true;
+  }catch{return false}
+}
+
 let deferredInstallPrompt=null;
 let swRegistration=null;
 let swReloading=false;
@@ -182,6 +210,12 @@ function updateInstallUI(){
     ?"iPhone／iPad：Safari 點「分享」→「加入主畫面」。"
     :"可將旅遊手冊安裝到主畫面，離線時仍可查看已載入資料。";
 }
+
+function repairPwaLaunchLink(){
+  rememberCurrentLaunchUrl();
+  alert("已記住目前這份旅程連結。\\n\\n如果主畫面 App 仍顯示全新狀態：\\n1. 刪除舊的主畫面圖示\\n2. 用 Safari 開啟目前這個旅程頁面\\n3. 重新「加入主畫面」一次");
+}
+
 async function installTravelApp(){
   if(isStandaloneMode())return;
   if(deferredInstallPrompt){
@@ -192,7 +226,7 @@ async function installTravelApp(){
     return;
   }
   if(isIOS()){
-    alert("iPhone／iPad 安裝方式：\n\n1. 請使用 Safari 開啟此網站\n2. 點下方「分享」圖示\n3. 往下選「加入主畫面」\n4. 點右上角「新增」");
+    alert("iPhone／iPad 安裝方式：\n\n1. 請先確認目前已開啟你自己的旅程頁面\n2. 使用 Safari 點下方「分享」圖示\n3. 往下選「加入主畫面」\n4. 點右上角「新增」\n\n之後從主畫面開啟會回到同一份旅程資料。");
     return;
   }
   alert("若瀏覽器沒有顯示安裝提示，請從瀏覽器選單選擇「安裝應用程式」或「加入主畫面」。");
@@ -228,6 +262,7 @@ window.addEventListener("beforeinstallprompt",e=>{
   updateInstallUI();
 });
 window.addEventListener("appinstalled",()=>{
+  rememberCurrentLaunchUrl();
   deferredInstallPrompt=null;
   updateInstallUI();
 });
@@ -953,6 +988,8 @@ document.addEventListener("visibilitychange",()=>{
 });
 
 async function init(){
+  if(restorePwaLaunchUrlIfNeeded())return;
+  rememberCurrentLaunchUrl();
   try{
     [trip,hotel,dayOverrides]=await Promise.all([loadJson("./public/data/osaka-2026.json"),loadJson("./public/data/hotel.json"),loadJson("./public/data/day-overrides.json").catch(()=>({days:[]}))]);
     trip=applyDayOverrides(trip,dayOverrides);
@@ -980,7 +1017,7 @@ $("#clearEdits").onclick=()=>{if(confirm("清除所有個人修改？原始行�
 $("#closeImageLightbox").onclick=closeImageLightbox;
 $("#imageLightbox").onclick=e=>{if(e.target===$("#imageLightbox"))closeImageLightbox()};
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#imageLightbox").classList.contains("hidden"))closeImageLightbox()});
-$("#addPrepItem").onclick=addPrep;$("#addShopping").onclick=addShopping;$("#appendBeautyProducts").onclick=()=>appendBeautyProducts(true);$("#installApp").onclick=installTravelApp;
+$("#addPrepItem").onclick=addPrep;$("#addShopping").onclick=addShopping;$("#appendBeautyProducts").onclick=()=>appendBeautyProducts(true);$("#installApp").onclick=installTravelApp;$("#repairPwaLink").onclick=repairPwaLaunchLink;
 
 $("#shoppingSearch").oninput=e=>{
   shoppingSearchText=e.target.value||"";

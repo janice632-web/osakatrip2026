@@ -1,12 +1,12 @@
-const APP_VERSION="4.1.0";
-const STATIC_CACHE="travel-companion-static-v4-1-0";
-const RUNTIME_CACHE="travel-companion-runtime-v4-1-0";
+const APP_VERSION="4.2.2";
+const STATIC_CACHE="travel-companion-static-v4-2-2";
+const RUNTIME_CACHE="travel-companion-runtime-v4-2-2";
 const APP_SHELL=[
   "./",
   "./index.html",
-  "./assets/app.css?v=410-phase3",
-  "./assets/app.js?v=410-phase3",
-  "./manifest.webmanifest?v=410-phase3",
+  "./assets/app.css?v=422-pwalaunch1",
+  "./assets/app.js?v=422-pwalaunch1",
+  "./manifest.webmanifest?v=422-pwalaunch1",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./public/data/osaka-2026.json",

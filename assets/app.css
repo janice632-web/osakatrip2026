@@ -300,3 +300,5 @@ body.lightbox-open{
   .image-lightbox{padding:12px}
   .image-lightbox-stage img{max-height:78vh;border-radius:11px}
 }
+
+.pwa-repair-btn{width:100%;margin-top:8px}
